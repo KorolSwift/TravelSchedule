@@ -75,7 +75,7 @@ struct ContentView: View {
                 
                 let service = NearestStationsService(
                     client: client,
-                    apikey: "ec6bb700-04b7-4330-911a-ed7b5bd146dd"
+                    apikey: ApiKeyProvider.shared.value
                 )
                 
                 print("Fetching stations...")
@@ -102,7 +102,7 @@ struct ContentView: View {
                 
                 let service = NearestSettlementService(
                     client: client,
-                    apikey: "ec6bb700-04b7-4330-911a-ed7b5bd146dd"
+                    apikey: ApiKeyProvider.shared.value
                 )
                 
                 print("Fetching nearest settlement...")
@@ -129,7 +129,7 @@ struct ContentView: View {
                 
                 let service = CarrierInformationService(
                     client: client,
-                    apikey: "ec6bb700-04b7-4330-911a-ed7b5bd146dd"
+                    apikey: ApiKeyProvider.shared.value
                 )
                 
                 print("Fetching carrier information...")
@@ -155,7 +155,7 @@ struct ContentView: View {
                 
                 let service = ScheduleBTWStationsService(
                     client: client,
-                    apikey: "ec6bb700-04b7-4330-911a-ed7b5bd146dd"
+                    apikey: ApiKeyProvider.shared.value
                 )
                 
                 print("Fetching schedule between stations...")
@@ -182,7 +182,7 @@ struct ContentView: View {
                 
                 let service = ScheduleByStationsServices(
                     client: client,
-                    apikey: "ec6bb700-04b7-4330-911a-ed7b5bd146dd"
+                    apikey: ApiKeyProvider.shared.value
                 )
                 
                 print("Fetching schedule by stations...")
@@ -207,7 +207,7 @@ struct ContentView: View {
                 
                 let service = StationsListServices(
                     client: client,
-                    apikey: "ec6bb700-04b7-4330-911a-ed7b5bd146dd"
+                    apikey: ApiKeyProvider.shared.value
                 )
                 
                 print("Fetching list of stations...")
@@ -232,7 +232,7 @@ struct ContentView: View {
                 
                 let service = CopyrightYandexSchedulesServices(
                     client: client,
-                    apikey: "ec6bb700-04b7-4330-911a-ed7b5bd146dd"
+                    apikey: ApiKeyProvider.shared.value
                 )
                 
                 print("Fetching copyright yandex schedules..")
@@ -257,7 +257,7 @@ struct ContentView: View {
                 
                 let service = AvailableStationsListServices(
                     client: client,
-                    apikey: "ec6bb700-04b7-4330-911a-ed7b5bd146dd"
+                    apikey: ApiKeyProvider.shared.value
                 )
                 
                 print("Fetching available stations list..")
