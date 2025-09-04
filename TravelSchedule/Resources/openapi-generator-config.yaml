@@ -1,0 +1,22 @@
+##
+#//  openapi-generator-config.yaml
+#//  TravelSchedule
+#//
+#//  Created by Ди Di on 22/08/25.
+#//
+#
+#accessModifier: public
+#
+#generate:
+#  - types
+#  - client
+
+# swift-openapi-generator config
+# Документация: https://github.com/apple/swift-openapi-generator
+
+accessModifier: public
+
+# Какие артефакты генерировать
+generate:
+  - types
+  - client
