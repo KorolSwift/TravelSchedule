@@ -9,12 +9,14 @@ import SwiftUI
 
 @main
 struct TravelScheduleApp: App {
-    let persistenceController = PersistenceController.shared
-
+    @StateObject private var networkMonitor = NetworkMonitor()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            RootView()
+                .environmentObject(networkMonitor)
         }
     }
 }
+
+
