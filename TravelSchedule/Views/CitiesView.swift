@@ -10,73 +10,83 @@ import SwiftUI
 
 struct CitiesView: View {
     let title: String
-    let cities: [String]
+    @Bindable var viewModel: CitiesViewModel
     @Binding var showDivider: Bool
-    @State private var searchString = ""
     @Binding var selectedStation: String
     let isFrom: Bool
     @Binding var path: NavigationPath
     
-    var searchCities: [String] {
-        if searchString.isEmpty {
-            return cities
-        } else {
-            return cities.filter {
-                $0.localizedCaseInsensitiveContains(searchString)
+    var body: some View {
+        contentView
+            .background(Color(.systemBackground))
+            .navigationTitle("Выбор города")
+            .toolbarRole(.editor)
+            .toolbar(.hidden, for: .tabBar)
+            .onAppear { showDivider = false }
+    }
+    
+    // MARK: - Subviews
+    private var contentView: some View {
+        VStack {
+            SearchBar(searchText: $viewModel.searchString)
+            if viewModel.isEmptyState {
+                emptyStateView
+            } else {
+                citiesListView
             }
         }
     }
     
-    var body: some View {
+    private var emptyStateView: some View {
         VStack {
-            SearchBar(searchText: $searchString)
-            if searchCities.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("Город не найден")
-                        .font(Font(UIFont.sfProDisplayBold24 ?? .systemFont(ofSize: 24, weight: .bold)))
-                    Spacer()
-                }
-            } else {
-                List {
-                    ForEach(searchCities, id: \.self) { city in
-                        NavigationLink(value: Nav.stations(city: city, isFrom: isFrom)) {
-                            Text(city)
-                        }
-                        .font(Font(UIFont.sfProDisplayRegular17 ?? .systemFont(ofSize: 17, weight: .regular)))
-                        .listRowSeparator(.hidden)
-                    }
-                }
-                .listStyle(.plain)
-                .background(Color(.systemBackground))
-                .scrollContentBackground(.hidden)
-                .listRowBackground(Color(.systemBackground))
+            Spacer()
+            Text("Город не найден")
+                .font(.system(size: 24, weight: .bold))
+            Spacer()
+        }
+    }
+    
+    private var citiesListView: some View {
+        List {
+            ForEach(viewModel.searchCities, id: \.self) { city in
+                cityRow(city: city)
             }
         }
+        .listStyle(.plain)
         .background(Color(.systemBackground))
-        .navigationTitle("Выбор города")
-        .toolbarRole(.editor)
-        .toolbar(.hidden, for: .tabBar)
-        .onAppear {
-            showDivider = false
-//            showServerError("500 Internal Server Error")
+        .scrollContentBackground(.hidden)
+        .listRowBackground(Color(.systemBackground))
+    }
+    
+    private func cityRow(city: String) -> some View {
+        NavigationLink(
+            value: Nav.stations(city: city, isFrom: isFrom)
+        ) {
+            Text(city)
+                .font(.system(size: 17, weight: .regular))
         }
+        .listRowSeparator(.hidden)
     }
 }
 
+
 #Preview {
-    @State var showDivider = true
-    @State var selectedStation = ""
-    @State var path = NavigationPath()
+    PreviewWrapper()
+}
+
+private struct PreviewWrapper: View {
+    @State private var showDivider = true
+    @State private var selectedStation = ""
+    @State private var navPath = NavigationPath()
     
-    return NavigationStack(path: $path) {
+    var body: some View {
         CitiesView(
             title: "Откуда",
-            cities: ["Москва", "Сочи", "Казань"],
+            viewModel: CitiesViewModel(cities: MockData.cities),
             showDivider: $showDivider,
             selectedStation: $selectedStation,
             isFrom: true,
-            path: $path
+            path: $navPath
         )
     }
 }

@@ -23,7 +23,7 @@ struct CarrierInfoView: View {
 }
 
 #Preview {
-    @State  var showDivider = true
+    @State var showDivider = true
     CarrierInfoView(segment: Segment(
         thread: Thread(
             uid: "12345",

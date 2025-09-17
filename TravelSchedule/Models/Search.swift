@@ -39,3 +39,11 @@ enum Nav: Hashable {
     case citiesTo
     case stations(city: String, isFrom: Bool)
 }
+
+enum FilterTimeRange {
+    static let morning = "Утро 06:00 - 12:00"
+    static let day = "День 12:00 - 18:00"
+    static let evening = "Вечер 18:00 - 00:00"
+    static let night = "Ночь 00:00 - 06:00"
+    static let allOptions = [morning, day, evening, night]
+}

@@ -19,11 +19,11 @@ struct SettingsView: View {
                     .resizable()
                     .frame(width: 223, height: 223)
                 Text("Ошибка сервера")
-                    .font(Font(UIFont.sfProDisplayBold24 ?? .systemFont(ofSize: 24, weight: .bold)))
+                    .font(.system(size: 24, weight: .bold))
                     .multilineTextAlignment(.center)
             } else {
                 Text("Настройки")
-                    .font(Font(UIFont.sfProDisplayBold24 ?? .systemFont(ofSize: 24, weight: .bold)))
+                    .font(.system(size: 24, weight: .bold))
                 Button("Показать ошибку сервера") {
                     serverErrorMessage = "500 Internal Server Error"
                 }

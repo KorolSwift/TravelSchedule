@@ -40,6 +40,9 @@
 		0268C9A82E734393003CBC04 /* Exceptions for "TravelSchedule" folder in "TravelSchedule" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Fonts/SF-Pro-Display-Bold.otf",
+				"Fonts/SF-Pro-Display-Medium.otf",
+				"Fonts/SF-Pro-Display-Regular.otf",
 				Info.plist,
 			);
 			target = 02449E8D2E58CE55003927D8 /* TravelSchedule */;

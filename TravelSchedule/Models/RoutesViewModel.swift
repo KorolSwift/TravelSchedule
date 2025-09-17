@@ -1,162 +1,91 @@
 //
-//  ContentView.swift
+//  RoutesViewModel.swift
 //  TravelSchedule
 //
-//  Created by Ди Di on 22/08/25.
+//  Created by Ди Di on 17/09/25.
 //
 
 import SwiftUI
-import CoreData
 import OpenAPIURLSession
-import UIKit
 
 
-struct ContentView: View {
-    @State private var path = NavigationPath()
-    @State private var selectedStationFrom = ""
-    @State private var selectedStationTo = ""
-    @State private var allRoutes: [Segment] = []
-    @State private var filteredRoutes: [Segment] = []
-    @Binding var showDivider: Bool
-    @State private var resetRoutesOnNextCarriersAppear = false
+@Observable
+final class RoutesViewModel {
+    var path = NavigationPath()
+    var selectedStationFrom: String = ""
+    var selectedStationTo: String = ""
+    var allRoutes: [Segment] = []
+    var filteredRoutes: [Segment] = []
+    var selectedTimes: Set<String> = []
+    var selectedTransfer: String = ""
+    var shouldResetOnAppear = false
     
-    var body: some View {
-        NavigationStack(path: $path) {
-            VStack {
-                ZStack(alignment: .trailing) {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.ypBlue)
-                        .frame(height: 128)
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.ypWhite)
-                        .frame(height: 96)
-                        .padding(.leading, 16)
-                        .padding(.trailing, 68)
-                    HStack {
-                        VStack(alignment: .leading, spacing: 0) {
-                            NavigationLink(value: Nav.citiesFrom) {
-                                HStack {
-                                    Text(selectedStationFrom.isEmpty ? "Откуда" : selectedStationFrom)
-                                        .foregroundColor(selectedStationFrom.isEmpty ? .ypGray : .black)
-                                        .font(Font(UIFont.sfProDisplayRegular17 ?? .systemFont(ofSize: 17, weight: .regular)))
-                                        .lineLimit(1)
-                                        .truncationMode(.tail)
-                                    Spacer()
-                                }
-                                .frame(height: 48)
-                                .padding(.horizontal, 16)
-                            }
-                            NavigationLink(value: Nav.citiesTo) {
-                                HStack {
-                                    Text(selectedStationTo.isEmpty ? "Куда" : selectedStationTo)
-                                        .foregroundColor(selectedStationTo.isEmpty ? .ypGray : .black)
-                                        .font(Font(UIFont.sfProDisplayRegular17 ?? .systemFont(ofSize: 17, weight: .regular)))
-                                        .lineLimit(1)
-                                        .truncationMode(.tail)
-                                    Spacer()
-                                }
-                                .frame(height: 48)
-                            }
-                            .padding(.horizontal, 16)
-                            .pickerStyle(.navigationLink)
-                            .foregroundColor(.ypGray)
-                        }
-                        .padding(.leading, 16)
-                        Spacer()
-                        Button(action: {
-                            swap(&selectedStationFrom, &selectedStationTo)
-                        }) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.white)
-                                    .frame(width: 36, height: 36)
-                                Image(systemName: "arrow.2.squarepath")
-                                    .foregroundColor(Color.ypBlue)
-                            }
-                        }
-                        .padding(.trailing, 16)
-                    }
-                }
-                .padding(16)
-                if !selectedStationTo.isEmpty && !selectedStationFrom.isEmpty {
-                    NavigationLink(value: Nav.carriers) {
-                        ZONaiseek()
-                    }
-                    .simultaneousGesture(TapGesture().onEnded {
-                        resetRoutesOnNextCarriersAppear = true
-                    })
-                    .onAppear {
-                        showDivider = true
-//                        showServerError("500 Internal Server Error")
-                    }
-                    //            testFetchStations()
-                    //            testFetchNearestSettlement()
-                    //            testFetchCarrierInformation()
-                    //            testFetchScheduleBTWStations()
-                    //            testFetchScheduleByStations()
-                    //            testFetchStationsList()
-                    //            testFetchCopyrightYandexSchedules()
-                    //            testAvailableStationsList()
-                }
-            }
-            .navigationDestination(for: Nav.self) { dest in
-                switch dest {
-                case .carriers:
-                    CarriersListView(
-                        selectedStationFrom: $selectedStationFrom,
-                        selectedStationTo: $selectedStationTo,
-                        allRoutes: $allRoutes,
-                        filteredRoutes: $filteredRoutes,
-                        navigationPath: $path,
-                        showDivider: $showDivider,
-                        shouldResetOnAppear: $resetRoutesOnNextCarriersAppear
-                    )
-                case .filtration:
-                    FiltrationView(
-                        allRoutes: $allRoutes,
-                        filteredRoutes: $filteredRoutes,
-                        showDivider: $showDivider
-                    )
-                case .segment(let seg):
-                    CarrierInfoView(segment: seg, showDivider: $showDivider)
-                case .citiesFrom:
-                    CitiesView(
-                        title: "Откуда",
-                        cities: cities,
-                        showDivider: $showDivider,
-                        selectedStation: $selectedStationFrom,
-                        isFrom: true,
-                        path: $path
-                    )
-                case .citiesTo:
-                    CitiesView(
-                        title: "Куда",
-                        cities: cities,
-                        showDivider: $showDivider,
-                        selectedStation: $selectedStationTo,
-                        isFrom: false,
-                        path: $path
-                    )
-                case .stations(let city, let isFrom):
-                    StationsView(
-                        city: city,
-                        showDivider: $showDivider,
-                        selectedStation: isFrom ? $selectedStationFrom : $selectedStationTo,
-                        path: $path
-                    )
-                }
+    var hasActiveFilters: Bool {
+        filteredRoutes.count != allRoutes.count
+    }
+    
+    var canSearch: Bool {
+        !selectedStationFrom.isEmpty && !selectedStationTo.isEmpty
+    }
+    
+    func swapStations() {
+        swap(&selectedStationFrom, &selectedStationTo)
+    }
+    
+    func handleOnAppear() {
+        if allRoutes.isEmpty, let search = loadMockSearch() {
+            allRoutes = search.segments
+            filteredRoutes = search.segments
+        }
+        if shouldResetOnAppear {
+            filteredRoutes = allRoutes
+            shouldResetOnAppear = false
+        }
+    }
+    
+    func applyFilters() {
+        filteredRoutes = allRoutes.filter { route in
+            matchesTimeFilter(route.departure) && matchesTransferFilter(route)
+        }
+    }
+    
+    func matchesTimeFilter(_ departure: String) -> Bool {
+        guard !selectedTimes.isEmpty else { return true }
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withTimeZone]
+        guard let date = formatter.date(from: departure) else { return false }
+        let hour = Calendar.current.component(.hour, from: date)
+        
+        return selectedTimes.contains { timeRange in
+            switch timeRange {
+            case "Утро 06:00 - 12:00": return (6..<12).contains(hour)
+            case "День 12:00 - 18:00": return (12..<18).contains(hour)
+            case "Вечер 18:00 - 00:00": return (18..<24).contains(hour)
+            case "Ночь 00:00 - 06:00": return (0..<6).contains(hour)
+            default: return false
             }
         }
     }
-    @ViewBuilder
-    private func ZONaiseek() -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color.ypBlue)
-                .frame(width: 150, height: 60)
-            Text("Найти")
-                .foregroundColor(.ypWhite)
-                .font(UIFont.sfProDisplayBold17 != nil ? Font(UIFont.sfProDisplayBold17!) : .system(size: 17, weight: .bold))
+    
+    func matchesTransferFilter(_ route: Segment) -> Bool {
+        switch selectedTransfer.trimmingCharacters(in: .whitespacesAndNewlines) {
+        case "Да":  return route.has_transfers
+        case "Нет": return !route.has_transfers
+        default:    return true
+        }
+    }
+    
+    func loadMockSearch() -> Search? {
+        guard let url = Bundle.main.url(forResource: "search", withExtension: "json") else {
+            print("Не найден файл search.json")
+            return nil
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            return try JSONDecoder().decode(Search.self, from: data)
+        } catch {
+            print("Ошибка парсинга JSON: \(error)")
+            return nil
         }
     }
     
@@ -375,9 +304,4 @@ struct ContentView: View {
             }
         }
     }
-}
-
-#Preview {
-    @State  var showDivider = true
-    ContentView(showDivider: $showDivider)
 }

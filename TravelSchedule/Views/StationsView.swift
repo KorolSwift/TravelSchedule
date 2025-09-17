@@ -10,64 +10,71 @@ import SwiftUI
 
 struct StationsView: View {
     let city: String
-    @State private var searchString = ""
+    @Bindable var viewModel: StationsViewModel
     @Binding var showDivider: Bool
     @Binding var selectedStation: String
-    var stationList: [String] { stations[city] ?? [] }
     @Binding var path: NavigationPath
     
-    var searchStations: [String] {
-        if searchString.isEmpty {
-            return stationList
-        } else {
-            return stationList.filter {
-                $0.localizedCaseInsensitiveContains(searchString)
+    var body: some View {
+        contentView
+            .onAppear {
+                showDivider = false
+                //            showServerError("500 Internal Server Error")
+            }
+            .navigationTitle("Выбор станции")
+            .toolbarRole(.editor)
+            .toolbar(.hidden, for: .tabBar)
+        
+    }
+    
+    // MARK: - Subviews
+    private var contentView: some View {
+        VStack {
+            SearchBar(searchText: $viewModel.searchString)
+            if viewModel.isEmptyState {
+                emptyStateView
+            } else {
+                stationsListView
             }
         }
     }
     
-    var body: some View {
+    private var emptyStateView: some View {
         VStack {
-            SearchBar(searchText: $searchString)
-            if searchStations.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("Станция не найдена")
-                        .font(Font(UIFont.sfProDisplayBold24 ?? .systemFont(ofSize: 24, weight: .bold)))
-                    Spacer()
-                }
-            } else {
-                List {
-                    ForEach(searchStations, id: \.self) { station in
-                        HStack {
-                            Text(station)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.gray)
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            selectedStation = "\(city) (\(station))"
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                path.removeLast(2)
-                            }
-                        }
-                        .listRowSeparator(.hidden)
-                    }
-                }
-                .listStyle(.plain)
-                .background(Color(.systemBackground))
-                .scrollContentBackground(.hidden)
-                .listRowBackground(Color(.systemBackground))
+            Spacer()
+            Text("Станция не найдена")
+                .font(.system(size: 24, weight: .bold))
+            Spacer()
+        }
+    }
+    
+    private var stationsListView: some View {
+        List {
+            ForEach(viewModel.searchStations, id: \.self) { station in
+                stationRow(station)
             }
         }
-        .onAppear {
-            showDivider = false
-            showServerError("500 Internal Server Error")
+        .listStyle(.plain)
+        .background(Color(.systemBackground))
+        .scrollContentBackground(.hidden)
+        .listRowBackground(Color(.systemBackground))
+    }
+    
+    private func stationRow(_ station: String) -> some View {
+        HStack {
+            Text(station)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .foregroundColor(.gray)
         }
-        .navigationTitle("Выбор станции")
-        .toolbarRole(.editor)
-        .toolbar(.hidden, for: .tabBar)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            selectedStation = "\(city) (\(station))"
+            withAnimation(.easeInOut(duration: 0.15)) {
+                path.removeLast(2)
+            }
+        }
+        .listRowSeparator(.hidden)
     }
 }
 
@@ -76,10 +83,12 @@ struct StationsView: View {
     @State var showDivider = true
     @State var selectedStation = ""
     @State var path = NavigationPath()
+    let viewModel = StationsViewModel(stations: ["Казанский вокзал", "Курский вокзал", "Белорусский вокзал"])
     
     return NavigationStack(path: $path) {
         StationsView(
             city: "Москва",
+            viewModel: viewModel,
             showDivider: $showDivider,
             selectedStation: $selectedStation,
             path: $path

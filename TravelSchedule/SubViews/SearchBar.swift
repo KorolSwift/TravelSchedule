@@ -21,7 +21,7 @@ struct SearchBar: View {
                 TextField(placeholder, text: $searchText, onEditingChanged: { editing in
                     isEditing = editing
                 })
-                .font(Font(UIFont.sfProDisplayRegular17 ?? .systemFont(ofSize: 17, weight: .regular)))
+                .font(.system(size: 17, weight: .regular))
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
                 
@@ -45,6 +45,7 @@ struct SearchBar: View {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),to: nil, from: nil, for: nil)
     }
 }
+
 
 #Preview {
     SearchBar(searchText: .constant("Москва"))

@@ -11,13 +11,9 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>UIAppFonts</key>
-	<array>
-		<string>SF-Pro-Display-Bold.otf</string>
-		<string>SF-Pro-Display-Medium.otf</string>
-		<string>SF-Pro-Display-Regular.otf</string>
-	</array>
-    <key>CFBundleDisplayName</key>
-    <string>TravelSchedule</string>
+	<array/>
+	<key>CFBundleDisplayName</key>
+	<string>TravelSchedule</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -35,7 +31,7 @@
 	</dict>
 	<key>NSPrincipalClass</key>
 	<string>UIApplication</string>
-    <key>UILaunchStoryboardName</key>
-    <string>LaunchScreen</string>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 </dict>
 </plist>

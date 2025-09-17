@@ -47,6 +47,7 @@ struct Checkbox: View {
     }
 }
 
+
 #Preview {
     @State var selected: Set<String> = ["Утро 06:00 - 12:00"]
     

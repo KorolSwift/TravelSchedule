@@ -9,109 +9,101 @@ import SwiftUI
 
 
 struct CarriersListView: View {
+    @Bindable var viewModel: RoutesViewModel
     @Binding var selectedStationFrom: String
     @Binding var selectedStationTo: String
-    @Binding var allRoutes: [Segment]
-    @Binding var filteredRoutes: [Segment]
     @Binding var navigationPath: NavigationPath
     @Binding var showDivider: Bool
-    @Binding var shouldResetOnAppear: Bool
-    
-    var hasActiveFilters: Bool {
-        return filteredRoutes.count != allRoutes.count
-    }
     
     var body: some View {
         VStack {
-            Text("\(selectedStationFrom) → \(selectedStationTo)")
-                .font(Font(UIFont.sfProDisplayBold24 ?? .systemFont(ofSize: 24, weight: .bold)))
-                .foregroundColor(.primary)
-                .padding()
+            headerView
             Spacer()
-            if filteredRoutes.isEmpty {
-                Text("Вариантов нет")
-                    .font(Font(UIFont.sfProDisplayBold24 ?? .systemFont(ofSize: 24, weight: .bold)))
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
-                Spacer()
-            } else {
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(filteredRoutes, id: \.self) { segment in
-                            NavigationLink(value: Nav.segment(segment)) {
-                                RowCarrierView(route: segment)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 80)
-                }}
+            contentView
         }
-        .safeAreaInset(edge: .bottom) {
-            Button {
-                if allRoutes.isEmpty {
-                    if let search = loadMockSearch() {
-                        allRoutes = search.segments
-                        filteredRoutes = search.segments
-                    }
-                }
-                navigationPath.append(Nav.filtration)
-            } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.ypBlue)
-                        .frame(height: 60)
-                    HStack(spacing: 8) {
-                        Text("Уточнить время")
-                            .foregroundColor(Color.ypWhite)
-                            .font(UIFont.sfProDisplayBold17 != nil ? Font(UIFont.sfProDisplayBold17!) : .system(size: 18, weight: .bold))
-                        if hasActiveFilters {
-                            Circle()
-                                .fill(Color.ypRed)
-                                .frame(width: 10, height: 10)
-                        }
-                    }
-                }
-                .padding(16)
-                .padding(.bottom, 24)
-            }
-        }
+        .safeAreaInset(edge: .bottom) { filterButton }
         .toolbarRole(.editor)
         .onAppear {
             showDivider = false
-            if allRoutes.isEmpty, let search = loadMockSearch() {
-                allRoutes = search.segments
-                filteredRoutes = search.segments
-            }
-            if shouldResetOnAppear {
-                filteredRoutes = allRoutes
-                shouldResetOnAppear = false
-            }
-//            showServerError("500 Internal Server Error")
+            viewModel.handleOnAppear()
         }
         .toolbar(.hidden, for: .tabBar)
     }
     
+    // MARK: - Subviews
+    private var headerView: some View {
+        Text("\(selectedStationFrom) → \(selectedStationTo)")
+            .font(.system(size: 24, weight: .bold))
+            .foregroundColor(.primary)
+            .padding()
+    }
     
-    func loadMockSearch() -> Search? {
-        guard let url = Bundle.main.url(forResource: "search", withExtension: "json") else {
-            print("Не найден файл search.json")
-            return nil
+    @ViewBuilder
+    private var contentView: some View {
+        if viewModel.filteredRoutes.isEmpty {
+            emptyStateView
+        } else {
+            routesListView
         }
-        do {
-            let data = try Data(contentsOf: url)
-            let decoder = JSONDecoder()
-            let search = try decoder.decode(Search.self, from: data)
-            return search
-        } catch {
-            print("Ошибка парсинга JSON: \(error)")
-            return nil
+    }
+    
+    private var emptyStateView: some View {
+        VStack {
+            Spacer()
+            Text("Вариантов нет")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+            Spacer()
+        }
+    }
+    
+    private var routesListView: some View {
+        ScrollView {
+            LazyVStack(spacing: 8) {
+                ForEach(viewModel.filteredRoutes, id: \.self) { segment in
+                    NavigationLink(value: Nav.segment(segment)) {
+                        RowCarrierView(route: segment)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 80)
+        }
+    }
+    
+    private var filterButton: some View {
+        Button {
+            if viewModel.allRoutes.isEmpty, let search = viewModel.loadMockSearch() {
+                viewModel.allRoutes = search.segments
+                viewModel.filteredRoutes = search.segments
+            }
+            navigationPath.append(Nav.filtration)
+        } label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.ypBlue)
+                    .frame(height: 60)
+                HStack(spacing: 8) {
+                    Text("Уточнить время")
+                        .foregroundColor(.ypWhite)
+                        .font(.system(size: 17, weight: .bold))
+                    if viewModel.hasActiveFilters {
+                        Circle()
+                            .fill(Color.ypRed)
+                            .frame(width: 10, height: 10)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 24)
         }
     }
 }
 
+
 #Preview {
-    PreviewWrapper()
+    PreviewWrapper(viewModel: RoutesViewModel())
 }
 
 private struct PreviewWrapper: View {
@@ -119,37 +111,37 @@ private struct PreviewWrapper: View {
     @State private var to = "Самарканд"
     @State private var navPath = NavigationPath()
     @State private var showDivider = true
-    
-    @State private var allRoutes: [Segment] = [
-        Segment(
-            thread: Thread(uid: "001", carrier: Carrier(title: "Узбекистан темир йуллари")),
-            start_date: "2025-09-10",
-            departure: "2025-09-10T08:00:00+03:00",
-            arrival: "2025-09-10T12:00:00+03:00",
-            duration: 14400,
-            has_transfers: false
-        ),
-        Segment(
-            thread: Thread(uid: "002", carrier: Carrier(title: "Afrosiyob")),
-            start_date: "2025-09-10",
-            departure: "2025-09-10T18:30:00+03:00",
-            arrival: "2025-09-10T22:30:00+03:00",
-            duration: 14400,
-            has_transfers: true
-        )
-    ]
-    @State private var filteredRoutes: [Segment] = []
     @State private var shouldResetOnAppear = false
+    @Bindable var viewModel: RoutesViewModel
     
     var body: some View {
         CarriersListView(
+            viewModel: viewModel,
             selectedStationFrom: $from,
             selectedStationTo: $to,
-            allRoutes: $allRoutes,
-            filteredRoutes: $filteredRoutes,
             navigationPath: $navPath,
-            showDivider: $showDivider,
-            shouldResetOnAppear: $shouldResetOnAppear
+            showDivider: $showDivider
         )
+        .onAppear {
+            viewModel.allRoutes = [
+                Segment(
+                    thread: Thread(uid: "001", carrier: Carrier(title: "Узбекистан темир йуллари")),
+                    start_date: "2025-09-10",
+                    departure: "2025-09-10T08:00:00+03:00",
+                    arrival: "2025-09-10T12:00:00+03:00",
+                    duration: 14400,
+                    has_transfers: false
+                ),
+                Segment(
+                    thread: Thread(uid: "002", carrier: Carrier(title: "Afrosiyob")),
+                    start_date: "2025-09-10",
+                    departure: "2025-09-10T18:30:00+03:00",
+                    arrival: "2025-09-10T22:30:00+03:00",
+                    duration: 14400,
+                    has_transfers: true
+                )
+            ]
+            viewModel.filteredRoutes = viewModel.allRoutes
+        }
     }
 }

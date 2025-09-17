@@ -38,6 +38,7 @@ struct RadioButton: View {
     }
 }
 
+
 #Preview {
     @State var selected = "Нет"
     

@@ -16,58 +16,13 @@ struct TabBarView: View {
     
     var body: some View {
         ZStack {
-            TabView(selection: $selectedTab) {
-                ContentView(showDivider: $showDivider)
-                    .tabItem {
-                        Image(.cloud)
-                            .renderingMode(.template)
-                    }
-                    .tag(0)
-                SettingsView(showDivider: $showDivider)
-                    .tabItem {
-                        Image(.gear)
-                            .renderingMode(.template)
-                    }
-                    .tag(1)
-            }
-            .accentColor(.primary)
-            .overlay(
-                VStack(spacing: 0) {
-                    if showDivider {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(height: 1)
-                    }
-                    Spacer().frame(height: 49)
-                }
-                    .allowsHitTesting(false),
-                alignment: .bottom
-            )
+            tabbar
+            dividerOverlay
             if !networkMonitor.isConnected {
-                VStack(spacing: 16) {
-                    Image(.noInternet)
-                        .resizable()
-                        .frame(width: 223, height: 223)
-                    Text("Нет интернетa")
-                        .font(Font(UIFont.sfProDisplayBold24 ?? .systemFont(ofSize: 24, weight: .bold)))
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(.systemBackground))
-                .zIndex(3)
+                noInternetOverlay
             }
             if serverErrorMessage != nil {
-                VStack(spacing: 16) {
-                    Image(.serverError)
-                        .resizable()
-                        .frame(width: 223, height: 223)
-                    Text("Ошибка сервера")
-                        .font(Font(UIFont.sfProDisplayBold24 ?? .systemFont(ofSize: 24, weight: .bold)))
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(.systemBackground))
-                .zIndex(4)
+                serverErrorOverlay
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .serverErrorOccurred)) { note in
@@ -78,7 +33,67 @@ struct TabBarView: View {
         }
         .environmentObject(networkMonitor)
     }
+    
+    private var tabbar: some View {
+        TabView(selection: $selectedTab) {
+            TripSearchView(showDivider: $showDivider)
+                .tabItem {
+                    Image(.cloud)
+                        .renderingMode(.template)
+                }
+                .tag(0)
+            SettingsView(showDivider: $showDivider)
+                .tabItem {
+                    Image(.gear)
+                        .renderingMode(.template)
+                }
+                .tag(1)
+        }
+        .accentColor(.primary)
+    }
+    
+    private var dividerOverlay: some View {
+        VStack(spacing: 0) {
+            if showDivider {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 1)
+            }
+            Spacer().frame(height: 49)
+        }
+        .allowsHitTesting(false)
+        .frame(maxHeight: .infinity, alignment: .bottom)
+    }
+    
+    private var noInternetOverlay: some View {
+        VStack(spacing: 16) {
+            Image(.noInternet)
+                .resizable()
+                .frame(width: 223, height: 223)
+            Text("Нет интернетa")
+                .font(.system(size: 24, weight: .bold))
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemBackground))
+        .zIndex(3)
+    }
+    
+    private var serverErrorOverlay: some View {
+        VStack(spacing: 16) {
+            Image(.serverError)
+                .resizable()
+                .frame(width: 223, height: 223)
+            Text("Ошибка сервера")
+                .font(.system(size: 24, weight: .bold))
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemBackground))
+        .zIndex(4)
+    }
 }
+
 
 #Preview {
     TabBarView()

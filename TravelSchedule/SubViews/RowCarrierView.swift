@@ -11,88 +11,113 @@ import SwiftUI
 struct RowCarrierView: View {
     let imageHeight: Double = 38
     let route: Segment
+    
     var body: some View {
         ZStack(alignment: .trailing) {
             RoundedRectangle(cornerRadius: 24)
                 .fill(Color.ypLightGray)
                 .frame(height: 104)
+            
             VStack {
-                HStack (spacing: 16) {
-                    Image(.carrier)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: imageHeight, height: imageHeight)
-                        .cornerRadius(12)
-                        .padding(.leading, 14)
-                    
-                    VStack (alignment: .leading) {
-                        Text(route.thread.carrier.title)
-                            .font(Font(UIFont.sfProDisplayRegular17 ?? .systemFont(ofSize: 17, weight: .regular)))
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .foregroundColor(.black)
-                        if route.has_transfers == true {
-                            Text("С пересадкой")
-                                .font(Font(UIFont.sfProDisplayRegular12 ?? .systemFont(ofSize: 12, weight: .regular)))
-                                .foregroundColor(.ypRed)
-                        }
-                    }
+                HStack(spacing: 16) {
+                    carrierInfoBlock
                     Spacer()
-                    VStack {
-                        Text(formatDate(route.start_date))
-                            .padding(.trailing, 7)
-                            .frame(maxHeight: .infinity, alignment: .top)
-                            .font(Font(UIFont.sfProDisplayRegular12 ?? .systemFont(ofSize: 12, weight: .regular)))
-                            .foregroundColor(.black)
-                        Spacer()
-                    }
-                    .frame(height: imageHeight)
+                    dateBlock
                 }
-                HStack (spacing: 16) {
-                    Text(formatTime(route.departure))
-                        .foregroundColor(.black)
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(height: 1)
-                        .font(Font(UIFont.sfProDisplayRegular17 ?? .systemFont(ofSize: 17, weight: .regular)))
-                    Text("\(Int(route.duration / 3600)) часов")
-                        .font(Font(UIFont.sfProDisplayRegular12 ?? .systemFont(ofSize: 12, weight: .regular)))
-                        .foregroundColor(.black)
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(height: 1)
-                    Text(formatTime(route.arrival))
-                        .font(Font(UIFont.sfProDisplayRegular17 ?? .systemFont(ofSize: 17, weight: .regular)))
-                        .foregroundColor(.black)
-                }
-                .padding(.horizontal, 14)
-                .foregroundColor(.primary)
-                
+                timesBlock
+                    .padding(.horizontal, 14)
+                    .foregroundColor(.primary)
             }
         }
     }
     
-    func formatDate(_ isoDate: String) -> String {
+    // MARK: - Subviews
+    private var carrierInfoBlock: some View {
+        HStack(spacing: 16) {
+            Image(.carrier)
+                .resizable()
+                .scaledToFit()
+                .frame(width: imageHeight, height: imageHeight)
+                .cornerRadius(12)
+                .padding(.leading, 14)
+            
+            VStack(alignment: .leading) {
+                Text(route.thread.carrier.title)
+                    .font(.system(size: 17, weight: .regular))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundColor(.black)
+                
+                if route.has_transfers {
+                    Text("С пересадкой")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundColor(.ypRed)
+                }
+            }
+        }
+    }
+    
+    private var dateBlock: some View {
+        VStack {
+            Text(formatDate(route.start_date))
+                .padding(.trailing, 7)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .font(.system(size: 12, weight: .regular))
+                .foregroundColor(.black)
+            Spacer()
+        }
+        .frame(height: imageHeight)
+    }
+    
+    private var timesBlock: some View {
+        HStack(spacing: 16) {
+            Text(formatTime(route.departure))
+                .foregroundColor(.black)
+            
+            Rectangle()
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 1)
+                .font(.system(size: 17, weight: .regular))
+            
+            Text("\(Int(route.duration / 3600)) часов")
+                .font(.system(size: 12, weight: .regular))
+                .foregroundColor(.black)
+            
+            Rectangle()
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 1)
+            
+            Text(formatTime(route.arrival))
+                .font(.system(size: 17, weight: .regular))
+                .foregroundColor(.black)
+        }
+    }
+    
+    private func formatDate(_ isoDate: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.locale = Locale(identifier: "ru_RU")
         
         if let date = formatter.date(from: isoDate) {
             let displayFormatter = DateFormatter()
-            displayFormatter.locale = Locale(identifier: "ru_RU")
-            displayFormatter.dateFormat = "d MMMM"
+            displayFormatter.locale = .current
+            displayFormatter.setLocalizedDateFormatFromTemplate("dMMM")
             return displayFormatter.string(from: date)
         }
         return isoDate
     }
     
-    func formatTime(_ isoDateString: String) -> String {
+    private func formatTime(_ isoDateString: String) -> String {
         let isoFormatter = ISO8601DateFormatter()
-        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withTimeZone, .withColonSeparatorInTime]
+        isoFormatter.formatOptions = [
+            .withInternetDateTime,
+            .withFractionalSeconds,
+            .withTimeZone,
+            .withColonSeparatorInTime
+        ]
         
         if let date = isoFormatter.date(from: isoDateString) ??
-            ISO8601DateFormatter().date(from: isoDateString)
-        {
+            ISO8601DateFormatter().date(from: isoDateString) {
             let timeFormatter = DateFormatter()
             timeFormatter.dateFormat = "HH:mm"
             timeFormatter.timeZone = TimeZone.current
@@ -101,6 +126,7 @@ struct RowCarrierView: View {
         return isoDateString
     }
 }
+
 
 #Preview {
     let mockCarrier = Carrier(title: "РЖД")
