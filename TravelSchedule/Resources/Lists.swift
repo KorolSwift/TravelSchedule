@@ -16,7 +16,7 @@ struct MockData {
         "Казань",
         "Омск"
     ]
-
+    
     static let stations: [String: [String]] = [
         "Москва": [
             "Киевский вокзал",

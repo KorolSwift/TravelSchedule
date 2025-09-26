@@ -21,7 +21,7 @@ final class RoutesViewModel {
     var shouldResetOnAppear = false
     
     var hasActiveFilters: Bool {
-        filteredRoutes.count != allRoutes.count
+        !selectedTimes.isEmpty || !selectedTransfer.isEmpty
     }
     
     var canSearch: Bool {
@@ -47,6 +47,8 @@ final class RoutesViewModel {
         filteredRoutes = allRoutes.filter { route in
             matchesTimeFilter(route.departure) && matchesTransferFilter(route)
         }
+        selectedTimes.removeAll()
+        selectedTransfer = ""
     }
     
     func matchesTimeFilter(_ departure: String) -> Bool {
@@ -253,7 +255,7 @@ final class RoutesViewModel {
                     serverURL: try Servers.Server1.url(),
                     transport: URLSessionTransport()
                 )
-                
+
                 let service = CopyrightYandexSchedulesServices(
                     client: client,
                     apikey: ApiKeyProvider.shared.value

@@ -18,12 +18,12 @@ protocol CopyrightYandexSchedulesServicesProtocol {
 final class CopyrightYandexSchedulesServices: CopyrightYandexSchedulesServicesProtocol {
     private let client: Client
     private let apikey: String
-
+    
     init(client: Client, apikey: String) {
         self.client = client
         self.apikey = apikey
     }
-
+    
     func getCopyrightYandexSchedules(format: String) async throws -> CopyrightYandexSchedules {
         let response = try await client.getCopyrightYandexSchedules(query: .init(
             apikey: apikey,

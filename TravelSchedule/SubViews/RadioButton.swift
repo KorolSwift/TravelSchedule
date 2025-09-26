@@ -22,6 +22,7 @@ struct RadioButton: View {
                             selectedTransfer = option
                         }
                     Spacer()
+                    
                     Image(systemName: selectedTransfer == option ? "largecircle.fill.circle" : "circle")
                         .resizable()
                         .frame(width: 24, height: 24)
