@@ -32,7 +32,7 @@ struct FiltrationView: View {
     private var timeSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Время отправления")
-                .font(.system(size: 24, weight: .bold))
+                .font(.bold24)
                 .padding(.horizontal, 16)
             Checkbox(
                 selectedOptions: $viewModel.selectedTimes,
@@ -44,7 +44,7 @@ struct FiltrationView: View {
     private var transferSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Показывать варианты с пересадками")
-                .font(.system(size: 24, weight: .bold))
+                .font(.bold24)
                 .padding(.horizontal, 16)
             RadioButton(
                 selectedTransfer: $viewModel.selectedTransfer,

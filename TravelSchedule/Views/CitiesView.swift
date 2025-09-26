@@ -41,7 +41,7 @@ struct CitiesView: View {
         VStack {
             Spacer()
             Text("Город не найден")
-                .font(.system(size: 24, weight: .bold))
+                .font(.bold24)
             Spacer()
         }
     }
@@ -63,7 +63,7 @@ struct CitiesView: View {
             value: Nav.stations(city: city, isFrom: isFrom)
         ) {
             Text(city)
-                .font(.system(size: 17, weight: .regular))
+                .font(.regular17)
         }
         .listRowSeparator(.hidden)
     }
@@ -73,7 +73,6 @@ struct CitiesView: View {
 #Preview {
     PreviewWrapper()
 }
-
 private struct PreviewWrapper: View {
     @State private var showDivider = true
     @State private var selectedStation = ""

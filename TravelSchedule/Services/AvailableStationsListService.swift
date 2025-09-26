@@ -10,7 +10,6 @@ import OpenAPIURLSession
 import Foundation
 
 
-
 typealias AvailableStationsList = Components.Schemas.AvailableStations
 
 protocol AvailableStationsListServicesProtocol {
@@ -20,12 +19,12 @@ protocol AvailableStationsListServicesProtocol {
 final class AvailableStationsListServices: AvailableStationsListServicesProtocol {
     private let client: Client
     private let apikey: String
-
+    
     init(client: Client, apikey: String) {
         self.client = client
         self.apikey = apikey
     }
-
+    
     func getAvailableStationsList() async throws -> AvailableStationsList {
         let response = try await client.getAvailableStationsList(query: .init(apikey: apikey))
         

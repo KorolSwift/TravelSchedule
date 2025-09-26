@@ -28,6 +28,14 @@ struct Thread: Decodable, Hashable  {
 
 struct Carrier: Decodable, Hashable  {
     let title: String
+    let code: Int?
+    let codes: CarrierCodes?
+    
+    struct CarrierCodes: Decodable, Hashable {
+        let iata: String?
+        let sirena: String?
+        let icao: String?
+    }
 }
 
 enum Nav: Hashable {

@@ -13,28 +13,38 @@ struct SettingsView: View {
     @State private var serverErrorMessage: String? = nil
     
     var body: some View {
-        VStack(spacing: 16) {
-            if let error = serverErrorMessage {
-                Image(.serverError)
-                    .resizable()
-                    .frame(width: 223, height: 223)
-                Text("Ошибка сервера")
-                    .font(.system(size: 24, weight: .bold))
-                    .multilineTextAlignment(.center)
-            } else {
-                Text("Настройки")
-                    .font(.system(size: 24, weight: .bold))
-                Button("Показать ошибку сервера") {
-                    serverErrorMessage = "500 Internal Server Error"
+        NavigationStack {
+            VStack {
+                SwitchToggle()
+                    .padding(.top, 24)
+                    .frame(height: 60)
+                NavigationLink(destination: TermsView(showDivider: $showDivider)) {
+                    HStack {
+                        Text("Пользовательское соглашение")
+                            .foregroundColor(.primary)
+                            .font(.regular17)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.primary)
+                    }
+                    .padding(.horizontal, 16)
+                    .frame(height: 60)
                 }
-                .padding(.top, 20)
+                Spacer()
+                Text("Приложение использует API «Яндекс.Расписания»")
+                    .font(.regular12)
+                    .foregroundColor(.primary)
+                Text("Версия 1.0 (beta)")
+                    .font(.regular12)
+                    .foregroundColor(.primary)
+                    .padding(.top, 16)
+                    .padding(.bottom, 24)
             }
-        }
-        .padding()
-        .toolbarRole(.editor)
-        .onAppear {
-            showDivider = true
-//            showServerError("500 Internal Server Error")
+            .toolbarRole(.editor)
+            .onAppear {
+                showDivider = true
+                //            showServerError("500 Internal Server Error")
+            }
         }
     }
 }
@@ -45,3 +55,4 @@ struct SettingsView: View {
     SettingsView(showDivider: $showDivider)
         .environmentObject(NetworkMonitor())
 }
+

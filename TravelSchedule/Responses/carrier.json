@@ -1,0 +1,18 @@
+{
+    "carrier": {
+        "code": 680,
+        "title": "Turkish Airlines",
+        "codes": {
+            "sirena": null,
+            "iata": "TK",
+            "icao": "THY"
+        },
+        "address": "Bakırköy/ İstanbul",
+        "url": "http://www.turkishairlines.com/",
+        "email": "123@example.com",
+        "contacts": "",
+        "phone": "444 08 49",
+        "logo": "https://yastat.net/s3/rasp/media/data/company/logo/thy_kopya.jpg",
+        "offices": []
+    }
+}

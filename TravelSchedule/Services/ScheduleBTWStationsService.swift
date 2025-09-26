@@ -18,12 +18,12 @@ protocol ScheduleBTWStationsServiceProtocol {
 final class ScheduleBTWStationsService: ScheduleBTWStationsServiceProtocol {
     private let client: Client
     private let apikey: String
-
+    
     init(client: Client, apikey: String) {
         self.client = client
         self.apikey = apikey
     }
-
+    
     func getScheduleBTWStations(from: String, to: String, date: String) async throws -> ScheduleBTWStations {
         let response = try await client.getScheduleBTWStations(query: .init(
             apikey: apikey,

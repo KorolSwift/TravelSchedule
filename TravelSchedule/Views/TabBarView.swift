@@ -71,7 +71,7 @@ struct TabBarView: View {
                 .resizable()
                 .frame(width: 223, height: 223)
             Text("Нет интернетa")
-                .font(.system(size: 24, weight: .bold))
+                .font(.bold24)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -85,7 +85,7 @@ struct TabBarView: View {
                 .resizable()
                 .frame(width: 223, height: 223)
             Text("Ошибка сервера")
-                .font(.system(size: 24, weight: .bold))
+                .font(.bold24)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

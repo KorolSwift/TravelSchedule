@@ -21,7 +21,7 @@ struct SearchBar: View {
                 TextField(placeholder, text: $searchText, onEditingChanged: { editing in
                     isEditing = editing
                 })
-                .font(.system(size: 17, weight: .regular))
+                .font(.regular17)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
                 

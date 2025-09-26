@@ -11,19 +11,58 @@ import CoreData
 
 struct TripSearchView: View {
     @Binding var showDivider: Bool
-    let cities = MockData.cities
     @State private var viewModel = RoutesViewModel()
+    @State private var selectedGroupIndex: Int? = nil
+    @State private var showStories = false
+    @State private var viewedStories: Set<Int> = []
+    let cities = MockData.cities
+    private let mockCarrierInfo = MockDataInfo.loadCarrierInfo()
+    private let storyGroups = (1...6).map { index in
+        StoryGroup(images: ["\(index)", "\(index).1"])
+    }
     
     var body: some View {
         NavigationStack(path: $viewModel.path) {
-            VStack {
+            VStack(spacing: 0) {
+                storiesHeader
+                    .padding(.top, 24)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 searchHeader
                 if viewModel.canSearch {
                     searchButton
                 }
+                Spacer()
             }
             .navigationDestination(for: Nav.self) { dest in
                 navigationDestination(for: dest)
+            }
+            .onAppear {
+                viewModel.filteredRoutes = viewModel.allRoutes
+            }
+        }
+    }
+    
+    private var storiesHeader: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(0..<storyGroups.count, id: \.self) { index in
+                    StoryPreview(
+                        group: storyGroups[index],
+                        title: StoryText.firstText,
+                        action: {
+                            selectedGroupIndex = index
+                            showStories = true
+                            viewedStories.insert(index)
+                        },
+                        isViewed: viewedStories.contains(index)
+                    )
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showStories) {
+            if let index = selectedGroupIndex {
+                StoriesView(startGroupIndex: index, viewedStories: $viewedStories)
             }
         }
     }
@@ -64,7 +103,7 @@ struct TripSearchView: View {
             HStack {
                 Text(title)
                     .foregroundColor(isPlaceholder ? .ypGray : .black)
-                    .font(.system(size: 17, weight: .regular))
+                    .font(.regular17)
                     .lineLimit(1)
                     .truncationMode(.tail)
                 Spacer()
@@ -97,7 +136,7 @@ struct TripSearchView: View {
                     .frame(width: 150, height: 60)
                 Text("Найти")
                     .foregroundColor(.ypWhite)
-                    .font(.system(size: 17, weight: .regular))
+                    .font(.regular17)
             }
         }
         .onAppear {
@@ -122,8 +161,9 @@ struct TripSearchView: View {
                 viewModel: viewModel,
                 showDivider: $showDivider
             )
+            
         case .segment(let seg):
-            CarrierInfoView(segment: seg, showDivider: $showDivider)
+            CarrierInfoView(showDivider: $showDivider, route: mockCarrierInfo)
         case .citiesFrom:
             CitiesView(
                 title: "Откуда",
@@ -145,6 +185,7 @@ struct TripSearchView: View {
         case .stations(let city, let isFrom):
             StationsView(
                 city: city,
+                viewModel: StationsViewModel(stations: MockData.stations[city] ?? []),
                 showDivider: $showDivider,
                 selectedStation: isFrom ? $viewModel.selectedStationFrom : $viewModel.selectedStationTo,
                 path: $viewModel.path
