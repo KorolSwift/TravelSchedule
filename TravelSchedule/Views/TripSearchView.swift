@@ -23,7 +23,7 @@ struct TripSearchView: View {
     
     var body: some View {
         NavigationStack(path: $viewModel.path) {
-            VStack(spacing: 0) {
+            VStack(spacing: Constants.Common.spacing0) {
                 storiesHeader
                     .padding(.top, 24)
                     .padding(.horizontal, 16)
@@ -45,7 +45,7 @@ struct TripSearchView: View {
     
     private var storiesHeader: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
+            HStack(spacing: Constants.Common.spacing12) {
                 ForEach(0..<storyGroups.count, id: \.self) { index in
                     StoryPreview(
                         group: storyGroups[index],
@@ -69,23 +69,23 @@ struct TripSearchView: View {
     
     private var searchHeader: some View {
         ZStack(alignment: .trailing) {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: Constants.Common.cornerRadius20)
                 .fill(Color.ypBlue)
                 .frame(height: 128)
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)
                 .fill(Color.ypWhite)
                 .frame(height: 96)
                 .padding(.leading, 16)
                 .padding(.trailing, 68)
             HStack {
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: Constants.Common.spacing0) {
                     cityRow(
-                        title: viewModel.selectedStationFrom.isEmpty ? "Откуда" : viewModel.selectedStationFrom,
+                        title: viewModel.selectedStationFrom.isEmpty ? Constants.Texts.fromLabel : viewModel.selectedStationFrom,
                         isPlaceholder: viewModel.selectedStationFrom.isEmpty,
                         nav: .citiesFrom
                     )
                     cityRow(
-                        title: viewModel.selectedStationTo.isEmpty ? "Куда" : viewModel.selectedStationTo,
+                        title: viewModel.selectedStationTo.isEmpty ? Constants.Texts.toLabel : viewModel.selectedStationTo,
                         isPlaceholder: viewModel.selectedStationTo.isEmpty,
                         nav: .citiesTo
                     )
@@ -120,7 +120,7 @@ struct TripSearchView: View {
             ZStack {
                 Circle()
                     .fill(Color.white)
-                    .frame(width: 36, height: 36)
+                    .frame(width: Constants.Common.swapCircleSize, height: Constants.Common.swapCircleSize)
                 Image(systemName: "arrow.2.squarepath")
                     .foregroundColor(Color.ypBlue)
             }
@@ -131,10 +131,10 @@ struct TripSearchView: View {
     private var searchButton: some View {
         NavigationLink(value: Nav.carriers) {
             ZStack {
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)
                     .fill(Color.ypBlue)
-                    .frame(width: 150, height: 60)
-                Text("Найти")
+                    .frame(width: Constants.Common.width150, height: Constants.Common.height60)
+                Text(Constants.Buttons.find)
                     .foregroundColor(.ypWhite)
                     .font(.regular17)
             }
@@ -154,19 +154,22 @@ struct TripSearchView: View {
                 selectedStationFrom: $viewModel.selectedStationFrom,
                 selectedStationTo: $viewModel.selectedStationTo,
                 navigationPath: $viewModel.path,
-                showDivider: $showDivider,
+                showDivider: $showDivider
             )
         case .filtration:
             FiltrationView(
                 viewModel: viewModel,
                 showDivider: $showDivider
             )
-            
-        case .segment(let seg):
-            CarrierInfoView(showDivider: $showDivider, route: mockCarrierInfo)
+        case .segment:
+            if let carrier = mockCarrierInfo {
+                CarrierInfoView(showDivider: $showDivider, route: carrier)
+            } else {
+                EmptyView()
+            }
         case .citiesFrom:
             CitiesView(
-                title: "Откуда",
+                title: Constants.Texts.fromLabel,
                 viewModel: CitiesViewModel(cities: cities),
                 showDivider: $showDivider,
                 selectedStation: $viewModel.selectedStationFrom,
@@ -175,7 +178,7 @@ struct TripSearchView: View {
             )
         case .citiesTo:
             CitiesView(
-                title: "Куда",
+                title: Constants.Texts.toLabel,
                 viewModel: CitiesViewModel(cities: cities),
                 showDivider: $showDivider,
                 selectedStation: $viewModel.selectedStationTo,

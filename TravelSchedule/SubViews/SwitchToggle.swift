@@ -12,7 +12,7 @@ struct SwitchToggle: View {
     @AppStorage("isDarkMode") private var isDarkMode: Bool = false
     
     var body: some View {
-        Toggle("Темная тема", isOn: $isDarkMode)
+        Toggle(Constants.Texts.darkMode, isOn: $isDarkMode)
             .tint(.ypBlue)
             .foregroundColor(.primary)
             .font(.regular17)

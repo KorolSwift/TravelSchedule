@@ -28,7 +28,7 @@ struct StoriesView: View {
         self.storyGroups = (1...6).map {
             index in StoryGroup(images: ["\(index)", "\(index).1"])
         }
-        self.configuration = Configuration(secondsPerStory: 10)
+        self.configuration = Configuration(secondsPerStory: Constants.Stories.secondsPerStory)
         _timer = State(initialValue: Self.createTimer(configuration: configuration))
         _currentGroupIndex = State(initialValue: startGroupIndex)
     }
@@ -37,8 +37,8 @@ struct StoriesView: View {
         let timerTickInternal: TimeInterval
         let progressPerTick: CGFloat
         init(
-            secondsPerStory: TimeInterval = 10,
-            timerTickInternal: TimeInterval = 0.05
+            secondsPerStory: TimeInterval = Constants.Stories.secondsPerStory,
+            timerTickInternal: TimeInterval = Constants.Stories.tickInterval
         ) {
             self.timerTickInternal = timerTickInternal
             self.progressPerTick = 1.0 / secondsPerStory * timerTickInternal
@@ -71,12 +71,12 @@ private extension StoriesView {
         return Image(currentImage)
             .resizable()
             .ignoresSafeArea()
-            .cornerRadius(40)
+            .cornerRadius(Constants.Common.cornerRadius40)
             .background(Color.black)
     }
     
     var overlayControls: some View {
-        VStack(alignment: .trailing, spacing: 4) {
+        VStack(alignment: .trailing, spacing: Constants.Common.spacing4) {
             ProgressBar(
                 numberOfSections: numberOfSections,
                 progress: (CGFloat(currentImageIndex) + progress) / CGFloat(numberOfSections)

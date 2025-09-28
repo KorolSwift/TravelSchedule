@@ -50,7 +50,7 @@ struct CarriersListView: View {
     private var emptyStateView: some View {
         VStack {
             Spacer()
-            Text("Вариантов нет")
+            Text(Constants.Errors.noRoutes)
                 .font(.bold24)
                 .foregroundColor(.primary)
                 .multilineTextAlignment(.center)
@@ -60,7 +60,7 @@ struct CarriersListView: View {
     
     private var routesListView: some View {
         ScrollView {
-            LazyVStack(spacing: 8) {
+            LazyVStack(spacing: Constants.Common.spacing8) {
                 ForEach(viewModel.filteredRoutes, id: \.self) { segment in
                     NavigationLink(value: Nav.segment(segment)) {
                         RowCarrierView(route: segment)
@@ -81,11 +81,11 @@ struct CarriersListView: View {
             navigationPath.append(Nav.filtration)
         } label: {
             ZStack {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)
                     .fill(Color.ypBlue)
-                    .frame(height: 60)
-                HStack(spacing: 8) {
-                    Text("Уточнить время")
+                    .frame(height: Constants.Common.height60)
+                HStack(spacing: Constants.Common.spacing8) {
+                    Text(Constants.Buttons.refineTime)
                         .foregroundColor(.ypWhite)
                         .font(.bold17)
                     if viewModel.hasActiveFilters {

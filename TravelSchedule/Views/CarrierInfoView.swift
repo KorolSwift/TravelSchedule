@@ -14,7 +14,7 @@ struct CarrierInfoView: View {
     
     var body: some View {
         VStack {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: Constants.Common.spacing16) {
                 CarrierImageView()
                 CarrierTitleView(title: route.carrier.title)
                 CarrierContactInfoView(email: route.carrier.email, phone: route.carrier.phone)
@@ -25,7 +25,7 @@ struct CarrierInfoView: View {
             Spacer()
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Информация о перевозчике")
+        .navigationTitle(Constants.Texts.carrInfo)
         .toolbarRole(.editor)
         .toolbar(.hidden, for: .tabBar)
         .onAppear { showDivider = false }
@@ -58,12 +58,12 @@ struct CarrierInfoView: View {
         let phone: String?
         
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                if let email, !email.isEmpty {
-                    ContactRow(label: "E-mail", value: email)
+            VStack(alignment: .leading, spacing: Constants.Common.spacing0) {
+                if let email = email, email.isEmpty == false {
+                    ContactRow(label: Constants.Texts.contactEmail, value: email)
                 }
-                if let phone, !phone.isEmpty {
-                    ContactRow(label: "Телефон", value: phone)
+                if let phone = phone, phone.isEmpty == false {
+                    ContactRow(label: Constants.Texts.contactPhone, value: phone)
                 }
             }
         }
@@ -82,7 +82,7 @@ struct CarrierInfoView: View {
                     .font(.regular12)
                     .foregroundColor(.ypBlue)
             }
-            .frame(height: 60)
+            .frame(height: Constants.Common.height60)
         }
     }
 }

@@ -13,13 +13,14 @@ struct TermsView: View {
     
     var body: some View {
         WebView(url: URL(string: "https://yandex.ru/legal/practicum_offer/")!)
-            .navigationTitle("Пользовательское соглашение")
+            .navigationTitle(Constants.Texts.userAgreement)
             .font(.bold17)
             .edgesIgnoringSafeArea(.bottom)
             .onAppear {
-                showDivider = false
+                showDivider = false 
             }
             .toolbar(.hidden, for: .tabBar)
+            .toolbarRole(.editor)
     }
 }
 

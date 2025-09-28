@@ -17,10 +17,10 @@ struct SettingsView: View {
             VStack {
                 SwitchToggle()
                     .padding(.top, 24)
-                    .frame(height: 60)
+                    .frame(height: Constants.Common.height60)
                 NavigationLink(destination: TermsView(showDivider: $showDivider)) {
                     HStack {
-                        Text("Пользовательское соглашение")
+                        Text(Constants.Texts.userAgreement)
                             .foregroundColor(.primary)
                             .font(.regular17)
                         Spacer()
@@ -28,13 +28,13 @@ struct SettingsView: View {
                             .foregroundColor(.primary)
                     }
                     .padding(.horizontal, 16)
-                    .frame(height: 60)
+                    .frame(height: Constants.Common.height60)
                 }
                 Spacer()
-                Text("Приложение использует API «Яндекс.Расписания»")
+                Text(Constants.Texts.appUsing)
                     .font(.regular12)
                     .foregroundColor(.primary)
-                Text("Версия 1.0 (beta)")
+                Text(Constants.Texts.version)
                     .font(.regular12)
                     .foregroundColor(.primary)
                     .padding(.top, 16)

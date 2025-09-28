@@ -60,10 +60,10 @@ final class RoutesViewModel {
         
         return selectedTimes.contains { timeRange in
             switch timeRange {
-            case "Утро 06:00 - 12:00": return (6..<12).contains(hour)
-            case "День 12:00 - 18:00": return (12..<18).contains(hour)
-            case "Вечер 18:00 - 00:00": return (18..<24).contains(hour)
-            case "Ночь 00:00 - 06:00": return (0..<6).contains(hour)
+            case FilterTimeRange.morning: return (6..<12).contains(hour)
+            case FilterTimeRange.day: return (12..<18).contains(hour)
+            case FilterTimeRange.evening: return (18..<24).contains(hour)
+            case FilterTimeRange.night: return (0..<6).contains(hour)
             default: return false
             }
         }
@@ -255,7 +255,7 @@ final class RoutesViewModel {
                     serverURL: try Servers.Server1.url(),
                     transport: URLSessionTransport()
                 )
-
+                
                 let service = CopyrightYandexSchedulesServices(
                     client: client,
                     apikey: ApiKeyProvider.shared.value

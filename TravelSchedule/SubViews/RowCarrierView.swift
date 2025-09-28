@@ -9,17 +9,17 @@ import SwiftUI
 
 
 struct RowCarrierView: View {
-    let imageHeight: Double = 38
+    let imageHeight: Double = Constants.Common.height38
     let route: Segment
     
     var body: some View {
         ZStack(alignment: .trailing) {
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)
                 .fill(Color.ypLightGray)
-                .frame(height: 104)
+                .frame(height: Constants.Common.cardHeight104)
             
             VStack {
-                HStack(spacing: 16) {
+                HStack(spacing: Constants.Common.spacing16) {
                     carrierInfoBlock
                     Spacer()
                     dateBlock
@@ -33,12 +33,12 @@ struct RowCarrierView: View {
     
     // MARK: - Subviews
     private var carrierInfoBlock: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: Constants.Common.spacing16) {
             Image(.carrier)
                 .resizable()
                 .scaledToFit()
                 .frame(width: imageHeight, height: imageHeight)
-                .cornerRadius(12)
+                .cornerRadius(Constants.Common.cornerRadius12)
                 .padding(.leading, 14)
             
             VStack(alignment: .leading) {
@@ -49,7 +49,7 @@ struct RowCarrierView: View {
                     .foregroundColor(.black)
                 
                 if route.has_transfers {
-                    Text("С пересадкой")
+                    Text(Constants.Texts.withTransfer)
                         .font(.regular12)
                         .foregroundColor(.ypRed)
                 }
@@ -70,7 +70,7 @@ struct RowCarrierView: View {
     }
     
     private var timesBlock: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: Constants.Common.spacing16) {
             Text(formatTime(route.departure))
                 .foregroundColor(.black)
             

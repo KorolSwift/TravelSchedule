@@ -13,11 +13,11 @@ struct Checkbox: View {
     let options: [String]
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: Constants.Common.spacing0) {
             ForEach(options, id: \.self) { option in
                 HStack {
                     Text(option)
-                        .frame(height: 60)
+                        .frame(height: Constants.Common.height60)
                         .onTapGesture {
                             toggle(option)
                         }
@@ -25,7 +25,7 @@ struct Checkbox: View {
                     
                     Image(systemName: selectedOptions.contains(option) ? "checkmark.square.fill" : "square")
                         .resizable()
-                        .frame(width: 24, height: 24)
+                        .frame(width: Constants.Common.checkmarkSize, height: Constants.Common.checkmarkSize)
                         .foregroundColor(selectedOptions.contains(option) ? .primary : .secondary)
                         .onTapGesture {
                             toggle(option)

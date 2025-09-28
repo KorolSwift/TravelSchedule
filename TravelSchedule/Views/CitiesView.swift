@@ -19,7 +19,7 @@ struct CitiesView: View {
     var body: some View {
         contentView
             .background(Color(.systemBackground))
-            .navigationTitle("Выбор города")
+            .navigationTitle(Constants.Texts.cityChoice)
             .toolbarRole(.editor)
             .toolbar(.hidden, for: .tabBar)
             .onAppear { showDivider = false }
@@ -40,7 +40,7 @@ struct CitiesView: View {
     private var emptyStateView: some View {
         VStack {
             Spacer()
-            Text("Город не найден")
+            Text(Constants.Errors.noCity)
                 .font(.bold24)
             Spacer()
         }

@@ -30,7 +30,7 @@ struct StoryTextOverlay: View {
     var body: some View {
         VStack {
             Spacer()
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: Constants.Common.spacing16) {
                 Text(title)
                     .font(.bold34)
                     .foregroundColor(.ypWhite)
@@ -60,12 +60,12 @@ struct StoryPreview: View {
                     Image(firstImage)
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 92, height: 140)
+                        .frame(width: Constants.Story.previewWidth, height: Constants.Story.previewHeight)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 16)
+                            RoundedRectangle(cornerRadius: Constants.Common.cornerRadius16)
                                 .stroke(isViewed ? Color.clear : Color.ypBlue, lineWidth: 4)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .clipShape(RoundedRectangle(cornerRadius: Constants.Common.cornerRadius16))
                     VStack(alignment: .trailing) {
                         Spacer()
                         Text(title)
@@ -76,7 +76,7 @@ struct StoryPreview: View {
                             .padding(.bottom, 12)
                     }
                 }
-                .frame(width: 92, height: 140)
+                .frame(width: Constants.Story.previewWidth, height: Constants.Story.previewHeight)
                 .opacity(isViewed ? 0.5 : 1.0)
             }
         }

@@ -10,7 +10,7 @@ import SwiftUI
 struct SearchBar: View {
     @Binding var searchText: String
     @State private var isEditing = false
-    var placeholder = "Введите запрос"
+    var placeholder = Constants.Texts.enterQuery
     
     var body: some View {
         HStack {
@@ -36,7 +36,7 @@ struct SearchBar: View {
             }
             .padding(8)
             .background(Color(.systemGray5))
-            .cornerRadius(10)
+            .cornerRadius(Constants.Common.cornerRadius10)
         }
         .padding(.horizontal)
     }
