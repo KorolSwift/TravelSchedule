@@ -33,7 +33,7 @@ struct CarriersListView: View {
     // MARK: - Subviews
     private var headerView: some View {
         Text("\(selectedStationFrom) → \(selectedStationTo)")
-            .font(.system(size: 24, weight: .bold))
+            .font(.bold24)
             .foregroundColor(.primary)
             .padding()
     }
@@ -50,8 +50,8 @@ struct CarriersListView: View {
     private var emptyStateView: some View {
         VStack {
             Spacer()
-            Text("Вариантов нет")
-                .font(.system(size: 24, weight: .bold))
+            Text(Constants.Errors.noRoutes)
+                .font(.bold24)
                 .foregroundColor(.primary)
                 .multilineTextAlignment(.center)
             Spacer()
@@ -60,7 +60,7 @@ struct CarriersListView: View {
     
     private var routesListView: some View {
         ScrollView {
-            LazyVStack(spacing: 8) {
+            LazyVStack(spacing: Constants.Common.spacing8) {
                 ForEach(viewModel.filteredRoutes, id: \.self) { segment in
                     NavigationLink(value: Nav.segment(segment)) {
                         RowCarrierView(route: segment)
@@ -81,13 +81,13 @@ struct CarriersListView: View {
             navigationPath.append(Nav.filtration)
         } label: {
             ZStack {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)
                     .fill(Color.ypBlue)
-                    .frame(height: 60)
-                HStack(spacing: 8) {
-                    Text("Уточнить время")
+                    .frame(height: Constants.Common.height60)
+                HStack(spacing: Constants.Common.spacing8) {
+                    Text(Constants.Buttons.refineTime)
                         .foregroundColor(.ypWhite)
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.bold17)
                     if viewModel.hasActiveFilters {
                         Circle()
                             .fill(Color.ypRed)
@@ -103,45 +103,16 @@ struct CarriersListView: View {
 
 
 #Preview {
-    PreviewWrapper(viewModel: RoutesViewModel())
-}
-
-private struct PreviewWrapper: View {
-    @State private var from = "Ташкент"
-    @State private var to = "Самарканд"
-    @State private var navPath = NavigationPath()
-    @State private var showDivider = true
-    @State private var shouldResetOnAppear = false
-    @Bindable var viewModel: RoutesViewModel
+    @Previewable @State var from = "Москва"
+    @Previewable @State var to = "Санкт-Петербург"
+    @Previewable @State var path = NavigationPath()
+    @Previewable @State var divider = false
     
-    var body: some View {
-        CarriersListView(
-            viewModel: viewModel,
-            selectedStationFrom: $from,
-            selectedStationTo: $to,
-            navigationPath: $navPath,
-            showDivider: $showDivider
-        )
-        .onAppear {
-            viewModel.allRoutes = [
-                Segment(
-                    thread: Thread(uid: "001", carrier: Carrier(title: "Узбекистан темир йуллари")),
-                    start_date: "2025-09-10",
-                    departure: "2025-09-10T08:00:00+03:00",
-                    arrival: "2025-09-10T12:00:00+03:00",
-                    duration: 14400,
-                    has_transfers: false
-                ),
-                Segment(
-                    thread: Thread(uid: "002", carrier: Carrier(title: "Afrosiyob")),
-                    start_date: "2025-09-10",
-                    departure: "2025-09-10T18:30:00+03:00",
-                    arrival: "2025-09-10T22:30:00+03:00",
-                    duration: 14400,
-                    has_transfers: true
-                )
-            ]
-            viewModel.filteredRoutes = viewModel.allRoutes
-        }
-    }
+    CarriersListView(
+        viewModel: RoutesViewModel(),
+        selectedStationFrom: $from,
+        selectedStationTo: $to,
+        navigationPath: $path,
+        showDivider: $divider
+    )
 }

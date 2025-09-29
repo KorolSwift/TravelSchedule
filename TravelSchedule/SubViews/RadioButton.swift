@@ -13,25 +13,26 @@ struct RadioButton: View {
     let transferOptions: [String]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Constants.Common.spacing12) {
             ForEach(transferOptions, id: \.self) { option in
                 HStack {
                     Text(option)
-                        .frame(height: 60)
+                        .frame(height: Constants.Common.height60)
                         .onTapGesture {
                             selectedTransfer = option
                         }
                     Spacer()
+                    
                     Image(systemName: selectedTransfer == option ? "largecircle.fill.circle" : "circle")
                         .resizable()
-                        .frame(width: 24, height: 24)
+                        .frame(width: Constants.Common.radioButtonSize, height: Constants.Common.radioButtonSize)
                         .onTapGesture {
                             selectedTransfer = option
                         }
                         .padding(.trailing, 18)
                 }
                 .foregroundColor(.primary)
-                .frame(height: 60)
+                .frame(height: Constants.Common.height60)
             }
         }
         .padding()

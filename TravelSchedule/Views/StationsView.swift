@@ -21,7 +21,7 @@ struct StationsView: View {
                 showDivider = false
                 //            showServerError("500 Internal Server Error")
             }
-            .navigationTitle("Выбор станции")
+            .navigationTitle(Constants.Texts.stationChoice)
             .toolbarRole(.editor)
             .toolbar(.hidden, for: .tabBar)
         
@@ -42,8 +42,8 @@ struct StationsView: View {
     private var emptyStateView: some View {
         VStack {
             Spacer()
-            Text("Станция не найдена")
-                .font(.system(size: 24, weight: .bold))
+            Text(Constants.Errors.noStation)
+                .font(.bold24)
             Spacer()
         }
     }

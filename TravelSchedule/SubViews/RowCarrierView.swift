@@ -9,17 +9,17 @@ import SwiftUI
 
 
 struct RowCarrierView: View {
-    let imageHeight: Double = 38
+    let imageHeight: Double = Constants.Common.height38
     let route: Segment
     
     var body: some View {
         ZStack(alignment: .trailing) {
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)
                 .fill(Color.ypLightGray)
-                .frame(height: 104)
+                .frame(height: Constants.Common.cardHeight104)
             
             VStack {
-                HStack(spacing: 16) {
+                HStack(spacing: Constants.Common.spacing16) {
                     carrierInfoBlock
                     Spacer()
                     dateBlock
@@ -33,24 +33,24 @@ struct RowCarrierView: View {
     
     // MARK: - Subviews
     private var carrierInfoBlock: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: Constants.Common.spacing16) {
             Image(.carrier)
                 .resizable()
                 .scaledToFit()
                 .frame(width: imageHeight, height: imageHeight)
-                .cornerRadius(12)
+                .cornerRadius(Constants.Common.cornerRadius12)
                 .padding(.leading, 14)
             
             VStack(alignment: .leading) {
                 Text(route.thread.carrier.title)
-                    .font(.system(size: 17, weight: .regular))
+                    .font(.regular17)
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .foregroundColor(.black)
                 
                 if route.has_transfers {
-                    Text("С пересадкой")
-                        .font(.system(size: 12, weight: .regular))
+                    Text(Constants.Texts.withTransfer)
+                        .font(.regular12)
                         .foregroundColor(.ypRed)
                 }
             }
@@ -62,7 +62,7 @@ struct RowCarrierView: View {
             Text(formatDate(route.start_date))
                 .padding(.trailing, 7)
                 .frame(maxHeight: .infinity, alignment: .top)
-                .font(.system(size: 12, weight: .regular))
+                .font(.regular12)
                 .foregroundColor(.black)
             Spacer()
         }
@@ -70,17 +70,17 @@ struct RowCarrierView: View {
     }
     
     private var timesBlock: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: Constants.Common.spacing16) {
             Text(formatTime(route.departure))
                 .foregroundColor(.black)
             
             Rectangle()
                 .fill(Color.gray.opacity(0.3))
                 .frame(height: 1)
-                .font(.system(size: 17, weight: .regular))
+                .font(.regular17)
             
             Text("\(Int(route.duration / 3600)) часов")
-                .font(.system(size: 12, weight: .regular))
+                .font(.regular12)
                 .foregroundColor(.black)
             
             Rectangle()
@@ -88,7 +88,7 @@ struct RowCarrierView: View {
                 .frame(height: 1)
             
             Text(formatTime(route.arrival))
-                .font(.system(size: 17, weight: .regular))
+                .font(.regular17)
                 .foregroundColor(.black)
         }
     }
@@ -129,11 +129,15 @@ struct RowCarrierView: View {
 
 
 #Preview {
-    let mockCarrier = Carrier(title: "РЖД")
+    let mockCarrier = Carrier(
+        title: "РЖД",
+        code: 123,
+        codes: nil
+    )
     let mockThread = Thread(uid: "028S_3_2", carrier: mockCarrier)
     let mockSegment = Segment(
         thread: mockThread,
-        start_date: "2025-09-14T00:00:00+03:00",
+        start_date: "2025-09-14",
         departure: "2025-09-14T12:30:00+03:00",
         arrival: "2025-09-14T18:00:00+03:00",
         duration: 19800,

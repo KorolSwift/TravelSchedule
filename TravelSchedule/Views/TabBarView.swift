@@ -53,7 +53,7 @@ struct TabBarView: View {
     }
     
     private var dividerOverlay: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: Constants.Common.spacing0) {
             if showDivider {
                 Rectangle()
                     .fill(Color.gray.opacity(0.3))
@@ -66,12 +66,12 @@ struct TabBarView: View {
     }
     
     private var noInternetOverlay: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Constants.Common.spacing16) {
             Image(.noInternet)
                 .resizable()
-                .frame(width: 223, height: 223)
-            Text("Нет интернетa")
-                .font(.system(size: 24, weight: .bold))
+                .frame(width: Constants.Common.errorsHeight, height: Constants.Common.errorsHeight)
+            Text(Constants.Errors.noInternet)
+                .font(.bold24)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -80,12 +80,12 @@ struct TabBarView: View {
     }
     
     private var serverErrorOverlay: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Constants.Common.spacing16) {
             Image(.serverError)
                 .resizable()
-                .frame(width: 223, height: 223)
-            Text("Ошибка сервера")
-                .font(.system(size: 24, weight: .bold))
+                .frame(width: Constants.Common.errorsHeight, height: Constants.Common.errorsHeight)
+            Text(Constants.Errors.serverError)
+                .font(.bold24)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

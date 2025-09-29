@@ -18,12 +18,12 @@ protocol CarrierInformationServiceProtocol {
 final class CarrierInformationService: CarrierInformationServiceProtocol {
     private let client: Client
     private let apikey: String
-
+    
     init(client: Client, apikey: String) {
         self.client = client
         self.apikey = apikey
     }
-
+    
     func getCarrierInformation(code: String, system: String) async throws -> CarrierInformation {
         let response = try await client.getCarrierInformation(query: .init(
             apikey: apikey,

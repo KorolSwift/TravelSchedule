@@ -30,9 +30,9 @@ struct FiltrationView: View {
     }
     
     private var timeSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Время отправления")
-                .font(.system(size: 24, weight: .bold))
+        VStack(alignment: .leading, spacing: Constants.Common.spacing16) {
+            Text(Constants.Texts.departureTime)
+                .font(.bold24)
                 .padding(.horizontal, 16)
             Checkbox(
                 selectedOptions: $viewModel.selectedTimes,
@@ -42,9 +42,9 @@ struct FiltrationView: View {
     }
     
     private var transferSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Показывать варианты с пересадками")
-                .font(.system(size: 24, weight: .bold))
+        VStack(alignment: .leading, spacing: Constants.Common.spacing16) {
+            Text(Constants.Texts.withTransfer)
+                .font(.bold24)
                 .padding(.horizontal, 16)
             RadioButton(
                 selectedTransfer: $viewModel.selectedTransfer,
@@ -61,10 +61,10 @@ struct FiltrationView: View {
             }
         } label: {
             ZStack {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)
                     .fill(Color.ypBlue)
-                    .frame(height: 60)
-                Text("Применить")
+                    .frame(height: Constants.Common.height60)
+                Text(Constants.Buttons.apply)
                     .foregroundColor(.ypWhite)
                     .padding()
             }
@@ -77,7 +77,6 @@ struct FiltrationView: View {
 #Preview {
     PreviewWrapper(viewModel: RoutesViewModel())
 }
-
 private struct PreviewWrapper: View {
     @State private var showDivider = true
     @Bindable var viewModel: RoutesViewModel

@@ -19,7 +19,7 @@ struct CitiesView: View {
     var body: some View {
         contentView
             .background(Color(.systemBackground))
-            .navigationTitle("Выбор города")
+            .navigationTitle(Constants.Texts.cityChoice)
             .toolbarRole(.editor)
             .toolbar(.hidden, for: .tabBar)
             .onAppear { showDivider = false }
@@ -40,8 +40,8 @@ struct CitiesView: View {
     private var emptyStateView: some View {
         VStack {
             Spacer()
-            Text("Город не найден")
-                .font(.system(size: 24, weight: .bold))
+            Text(Constants.Errors.noCity)
+                .font(.bold24)
             Spacer()
         }
     }
@@ -63,7 +63,7 @@ struct CitiesView: View {
             value: Nav.stations(city: city, isFrom: isFrom)
         ) {
             Text(city)
-                .font(.system(size: 17, weight: .regular))
+                .font(.regular17)
         }
         .listRowSeparator(.hidden)
     }
@@ -73,7 +73,6 @@ struct CitiesView: View {
 #Preview {
     PreviewWrapper()
 }
-
 private struct PreviewWrapper: View {
     @State private var showDivider = true
     @State private var selectedStation = ""

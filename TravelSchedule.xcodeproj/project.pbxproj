@@ -40,20 +40,28 @@
 		0268C9A82E734393003CBC04 /* Exceptions for "TravelSchedule" folder in "TravelSchedule" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Fonts/SF-Pro-Display-Bold.otf",
-				"Fonts/SF-Pro-Display-Medium.otf",
-				"Fonts/SF-Pro-Display-Regular.otf",
 				Info.plist,
 			);
 			target = 02449E8D2E58CE55003927D8 /* TravelSchedule */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		0230BA002E817B2100EB75BC /* Exceptions for "TravelSchedule" folder in "Compile Sources" phase from "TravelSchedule" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 02449E8A2E58CE55003927D8 /* Sources */;
+			membershipExceptions = (
+				Responses/carrier.json,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		02449E902E58CE55003927D8 /* TravelSchedule */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				0268C9A82E734393003CBC04 /* Exceptions for "TravelSchedule" folder in "TravelSchedule" target */,
+				0230BA002E817B2100EB75BC /* Exceptions for "TravelSchedule" folder in "Compile Sources" phase from "TravelSchedule" target */,
 			);
 			path = TravelSchedule;
 			sourceTree = "<group>";
