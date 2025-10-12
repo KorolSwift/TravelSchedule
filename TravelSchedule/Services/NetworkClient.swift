@@ -63,12 +63,11 @@ actor NetworkClient {
         return try response.ok.body.json
     }
     
-    func fetchAllStationsList() async throws -> [String: Any] {
+    func fetchAllStationsList() async throws -> Data {
         guard let url = URL(string: "https://api.rasp.yandex.net/v3.0/stations_list/?apikey=\(apikey)&format=json&lang=ru_RU") else {
             throw URLError(.badURL)
         }
         let (data, _) = try await URLSession.shared.data(from: url)
-        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        return json ?? [:]
+        return data
     }
 }

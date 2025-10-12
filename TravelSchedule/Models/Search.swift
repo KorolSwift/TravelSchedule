@@ -8,11 +8,11 @@
 import Foundation
 
 
-struct Search: Decodable, Hashable  {
+struct Search: Decodable, Hashable, Sendable  {
     let segments: [Segment]
 }
 
-struct Segment: Decodable, Identifiable, Hashable  {
+struct Segment: Decodable, Identifiable, Hashable, Sendable  {
     let thread: Thread
     let start_date: Date?
     let departure: Date?
@@ -25,19 +25,19 @@ struct Segment: Decodable, Identifiable, Hashable  {
     }
 }
 
-struct Thread: Decodable, Hashable  {
+struct Thread: Decodable, Hashable, Sendable  {
     let uid: String
     let carrier: Carrier
 }
 
-struct Carrier: Decodable, Hashable {
+struct Carrier: Decodable, Hashable, Sendable {
     let title: String
     let code: Int?
     let codes: CarrierCodes?
     let logo: String?
     let logo_svg: String?
     
-    struct CarrierCodes: Decodable, Hashable {
+    struct CarrierCodes: Decodable, Hashable, Sendable {
         let iata: String?
         let sirena: String?
         let icao: String?
@@ -68,37 +68,37 @@ struct StationItem: Hashable, Identifiable {
     var id: String { code }
 }
 
-struct AvailableStationsResponse: Decodable {
+struct AvailableStationsResponse: Decodable, Sendable {
     let countries: [Country]?
 }
 
-struct Country: Decodable {
+struct Country: Decodable, Sendable {
     let title: String?
     let regions: [Region]?
 }
 
-struct Region: Decodable {
+struct Region: Decodable, Sendable {
     let title: String?
     let settlements: [Settlement]?
 }
 
-struct Settlement: Decodable {
+struct Settlement: Decodable, Sendable {
     let title: String?
     let codes: SettlementCodes?
     let stations: [Station]?
 }
 
-struct SettlementCodes: Decodable {
+struct SettlementCodes: Decodable, Sendable {
     let yandex_code: String?
     let esr_code: String?
 }
 
-struct Station: Decodable {
+struct Station: Decodable, Sendable {
     let title: String?
     let codes: StationCodes?
 }
 
-struct StationCodes: Decodable {
+struct StationCodes: Decodable, Sendable {
     let yandex_code: String?
     let esr_code: String?
 }

@@ -27,7 +27,7 @@ struct StationsView: View {
             .navigationTitle(Constants.Texts.stationChoice)
             .toolbarRole(.editor)
             .toolbar(.hidden, for: .tabBar)
-            .task(id: city) {
+            .task(id: city) { @Sendable in
                 await viewModel.loadStations(for: city)
                 if isFrom {
                     parentViewModel.selectedCityFromCode = viewModel.cityCode

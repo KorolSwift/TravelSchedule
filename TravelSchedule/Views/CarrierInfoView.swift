@@ -44,7 +44,9 @@ struct CarrierInfoView: View {
         .toolbar(.hidden, for: .tabBar)
         .onAppear {
             showDivider = false
-            Task { await loadCarrierInfo() }
+            Task { @Sendable in
+                await loadCarrierInfo()
+            }
         }
     }
     

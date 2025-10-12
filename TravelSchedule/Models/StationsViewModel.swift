@@ -48,12 +48,11 @@ final class StationsViewModel {
         defer { isLoading = false }
         
         do {
-            let root = try await network.fetchAllStationsList()
-            guard let countries = root["countries"] as? [[String: Any]],
+            let data = try await network.fetchAllStationsList()
+            guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let countries = root["countries"] as? [[String: Any]],
                   let ru = countries.first(where: { ($0["title"] as? String) == "Россия" }),
-                  let regions = ru["regions"] as? [[String: Any]] else {
-                return
-            }
+                  let regions = ru["regions"] as? [[String: Any]] else { return }
             
             let target = normalize(city)
             var chosenSettlement: [String: Any]? = nil
