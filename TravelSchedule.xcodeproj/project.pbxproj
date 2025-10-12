@@ -10,6 +10,7 @@
 		021FF3B02E73293D0012CBF2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 021FF3AF2E73293D0012CBF2 /* Assets.xcassets */; };
 		02449EC72E58D034003927D8 /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 02449EC62E58D034003927D8 /* OpenAPIRuntime */; };
 		02449ECA2E58D198003927D8 /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = 02449EC92E58D198003927D8 /* OpenAPIURLSession */; };
+		02B421F72E968D0200394DB2 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 02B421F62E968D0200394DB2 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,22 +47,11 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		0230BA002E817B2100EB75BC /* Exceptions for "TravelSchedule" folder in "Compile Sources" phase from "TravelSchedule" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 02449E8A2E58CE55003927D8 /* Sources */;
-			membershipExceptions = (
-				Responses/carrier.json,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		02449E902E58CE55003927D8 /* TravelSchedule */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				0268C9A82E734393003CBC04 /* Exceptions for "TravelSchedule" folder in "TravelSchedule" target */,
-				0230BA002E817B2100EB75BC /* Exceptions for "TravelSchedule" folder in "Compile Sources" phase from "TravelSchedule" target */,
 			);
 			path = TravelSchedule;
 			sourceTree = "<group>";
@@ -83,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02B421F72E968D0200394DB2 /* Kingfisher in Frameworks */,
 				02449ECA2E58D198003927D8 /* OpenAPIURLSession in Frameworks */,
 				02449EC72E58D034003927D8 /* OpenAPIRuntime in Frameworks */,
 			);
@@ -149,6 +140,7 @@
 			packageProductDependencies = (
 				02449EC62E58D034003927D8 /* OpenAPIRuntime */,
 				02449EC92E58D198003927D8 /* OpenAPIURLSession */,
+				02B421F62E968D0200394DB2 /* Kingfisher */,
 			);
 			productName = TravelSchedule;
 			productReference = 02449E8E2E58CE55003927D8 /* TravelSchedule.app */;
@@ -236,6 +228,7 @@
 				02449EC52E58D034003927D8 /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */,
 				02449EC82E58D198003927D8 /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
 				0218F0092E5EDBAF006D0596 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */,
+				02B421F52E968D0200394DB2 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 02449E8F2E58CE55003927D8 /* Products */;
@@ -631,6 +624,14 @@
 				minimumVersion = 1.1.0;
 			};
 		};
+		02B421F52E968D0200394DB2 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.6.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -648,6 +649,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 02449EC82E58D198003927D8 /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */;
 			productName = OpenAPIURLSession;
+		};
+		02B421F62E968D0200394DB2 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 02B421F52E968D0200394DB2 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

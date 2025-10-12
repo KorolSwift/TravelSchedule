@@ -23,13 +23,20 @@ struct CitiesView: View {
             .toolbarRole(.editor)
             .toolbar(.hidden, for: .tabBar)
             .onAppear { showDivider = false }
+            .task {
+                await viewModel.loadCities()
+            }
     }
     
     // MARK: - Subviews
     private var contentView: some View {
         VStack {
             SearchBar(searchText: $viewModel.searchString)
-            if viewModel.isEmptyState {
+            if viewModel.isLoading {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .frame(maxHeight: .infinity)
+            } else if viewModel.isEmptyState {
                 emptyStateView
             } else {
                 citiesListView
@@ -81,7 +88,7 @@ private struct PreviewWrapper: View {
     var body: some View {
         CitiesView(
             title: "Откуда",
-            viewModel: CitiesViewModel(cities: MockData.cities),
+            viewModel: CitiesViewModel(),
             showDivider: $showDivider,
             selectedStation: $selectedStation,
             isFrom: true,

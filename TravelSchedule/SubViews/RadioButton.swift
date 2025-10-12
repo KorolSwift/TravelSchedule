@@ -41,12 +41,12 @@ struct RadioButton: View {
 
 
 #Preview {
-    @State var selected = "Нет"
-    
-    return RadioButton(
-        selectedTransfer: $selected,
-        transferOptions: ["Да", "Нет"]
-    )
-    .previewLayout(.sizeThatFits)
-    .padding()
+    StatefulPreviewWrapper("Нет") { selected in
+        RadioButton(
+            selectedTransfer: selected,
+            transferOptions: ["Да", "Нет"]
+        )
+        .previewLayout(.sizeThatFits)
+        .padding()
+    }
 }

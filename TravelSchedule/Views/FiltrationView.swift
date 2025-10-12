@@ -24,6 +24,8 @@ struct FiltrationView: View {
         }
         .onAppear {
             showDivider = false
+            viewModel.selectedTimes.removeAll()
+            viewModel.selectedTransfer = ""
         }
         .toolbar(.hidden, for: .tabBar)
         .toolbarRole(.editor)

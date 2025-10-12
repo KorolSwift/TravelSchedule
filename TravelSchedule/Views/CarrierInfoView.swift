@@ -8,38 +8,73 @@
 import SwiftUI
 
 
+@MainActor
 struct CarrierInfoView: View {
     @Binding var showDivider: Bool
-    let route: CarrierInfo
+    let route: Segment
+    
+    @State private var carrierInfo: Components.Schemas.CarrierInfo?
+    @State private var isLoading = true
+    @State private var errorMessage: String?
     
     var body: some View {
         VStack {
-            VStack(alignment: .leading, spacing: Constants.Common.spacing16) {
-                CarrierImageView()
-                CarrierTitleView(title: route.carrier.title)
-                CarrierContactInfoView(email: route.carrier.email, phone: route.carrier.phone)
+            if isLoading {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .padding()
+            } else if let info = carrierInfo {
+                VStack(alignment: .leading, spacing: Constants.Common.spacing16) {
+                    CarrierImageView(logo: info.carrier?.logo)
+
+                    if let carrier = info.carrier {
+                        CarrierTitleView(title: carrier.title ?? "Без названия")
+                        CarrierContactInfoView(email: carrier.email, phone: carrier.phone)
+                    }
+                }
+                .padding(.top, 16)
+                .padding(.horizontal, 16)
+                
+                Spacer()
             }
-            .padding(.top, 16)
-            .padding(.horizontal, 16)
-            
-            Spacer()
         }
         .background(Color(.systemBackground))
         .navigationTitle(Constants.Texts.carrInfo)
         .toolbarRole(.editor)
         .toolbar(.hidden, for: .tabBar)
-        .onAppear { showDivider = false }
+        .onAppear {
+            showDivider = false
+            Task { await loadCarrierInfo() }
+        }
     }
     
     // MARK: - Subviews
-    private struct CarrierImageView: View {
-        var body: some View {
-            Image(.carrierInfo)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity)
+        private struct CarrierImageView: View {
+            let logo: String?
+
+            var body: some View {
+                if let logo = logo, let url = URL(string: logo) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: .infinity)
+                        case .failure:
+                            EmptyView()
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                } else {
+                    EmptyView()
+                }
+            }
         }
-    }
     
     private struct CarrierTitleView: View {
         let title: String
@@ -85,20 +120,46 @@ struct CarrierInfoView: View {
             .frame(height: Constants.Common.height60)
         }
     }
+        
+        private func loadCarrierInfo() async {
+            guard let code = route.thread.carrier.codes?.iata else {
+                errorMessage = "Нет кода перевозчика (IATA)"
+                isLoading = false
+                return
+            }
+            do {
+                async let info = NetworkClient.shared.fetchCarrierInformation(code: code, system: "iata")
+                carrierInfo = try await info
+            } catch {
+                errorMessage = "Ошибка загрузки: \(error.localizedDescription)"
+            }
+
+            isLoading = false
+        }
 }
 
 
 #Preview {
-    CarrierInfoView(
-        showDivider: .constant(true),
-        route: CarrierInfo(
-            carrier: CarrierDetails(
-                code: 123,
-                logo: nil,
-                title: "Uzbekistan Airways",
-                email: "info@uzairways.com",
-                phone: "+998 71 200-00-00"
-            )
-        )
+    let mockCarrier = Carrier(
+        title: "Uzbekistan Airways",
+        code: 123,
+        codes: Carrier.CarrierCodes(iata: "HY", sirena: nil, icao: "UZB"),
+        logo: nil,
+        logo_svg: nil
     )
+    let mockThread = Thread(uid: "HY001", carrier: mockCarrier)
+    let mockSegment = Segment(
+        thread: mockThread,
+        start_date: Date(),
+        departure: Date(),
+        arrival: Date().addingTimeInterval(7200),
+        duration: 7200,
+        has_transfers: false
+    )
+    return CarrierInfoView(
+        showDivider: .constant(false),
+        route: mockSegment
+    )
+    .previewLayout(.sizeThatFits)
+    .padding()
 }

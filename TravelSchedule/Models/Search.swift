@@ -5,6 +5,8 @@
 //  Created by Ди Di on 08/09/25.
 //
 
+import Foundation
+
 
 struct Search: Decodable, Hashable  {
     let segments: [Segment]
@@ -12,13 +14,15 @@ struct Search: Decodable, Hashable  {
 
 struct Segment: Decodable, Identifiable, Hashable  {
     let thread: Thread
-    let start_date: String
-    let departure: String
-    let arrival: String
+    let start_date: Date?
+    let departure: Date?
+    let arrival: Date?
     let duration: Double
     let has_transfers: Bool
     
-    var id: String { "\(thread.uid)_\(departure)" }
+    var id: String {
+        "\(thread.uid)_\(departure?.timeIntervalSince1970 ?? 0)"
+    }
 }
 
 struct Thread: Decodable, Hashable  {
@@ -26,10 +30,12 @@ struct Thread: Decodable, Hashable  {
     let carrier: Carrier
 }
 
-struct Carrier: Decodable, Hashable  {
+struct Carrier: Decodable, Hashable {
     let title: String
     let code: Int?
     let codes: CarrierCodes?
+    let logo: String?
+    let logo_svg: String?
     
     struct CarrierCodes: Decodable, Hashable {
         let iata: String?
@@ -54,4 +60,45 @@ enum FilterTimeRange {
     static let evening = "Вечер 18:00 - 00:00"
     static let night = "Ночь 00:00 - 06:00"
     static let allOptions = [morning, day, evening, night]
+}
+
+struct StationItem: Hashable, Identifiable {
+    let code: String
+    let title: String
+    var id: String { code }
+}
+
+struct AvailableStationsResponse: Decodable {
+    let countries: [Country]?
+}
+
+struct Country: Decodable {
+    let title: String?
+    let regions: [Region]?
+}
+
+struct Region: Decodable {
+    let title: String?
+    let settlements: [Settlement]?
+}
+
+struct Settlement: Decodable {
+    let title: String?
+    let codes: SettlementCodes?
+    let stations: [Station]?
+}
+
+struct SettlementCodes: Decodable {
+    let yandex_code: String?
+    let esr_code: String?
+}
+
+struct Station: Decodable {
+    let title: String?
+    let codes: StationCodes?
+}
+
+struct StationCodes: Decodable {
+    let yandex_code: String?
+    let esr_code: String?
 }

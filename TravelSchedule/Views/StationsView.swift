@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Observation
 
 
 struct StationsView: View {
@@ -14,24 +15,36 @@ struct StationsView: View {
     @Binding var showDivider: Bool
     @Binding var selectedStation: String
     @Binding var path: NavigationPath
+    let parentViewModel: RoutesViewModel
+    let isFrom: Bool
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         contentView
             .onAppear {
                 showDivider = false
-                //            showServerError("500 Internal Server Error")
             }
             .navigationTitle(Constants.Texts.stationChoice)
             .toolbarRole(.editor)
             .toolbar(.hidden, for: .tabBar)
-        
+            .task(id: city) {
+                await viewModel.loadStations(for: city)
+                if isFrom {
+                    parentViewModel.selectedCityFromCode = viewModel.cityCode
+                } else {
+                    parentViewModel.selectedCityToCode = viewModel.cityCode
+                }
+            }
     }
     
-    // MARK: - Subviews
     private var contentView: some View {
         VStack {
             SearchBar(searchText: $viewModel.searchString)
-            if viewModel.isEmptyState {
+            if viewModel.isLoading {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .frame(maxHeight: .infinity)
+            } else if viewModel.isEmptyState {
                 emptyStateView
             } else {
                 stationsListView
@@ -69,9 +82,26 @@ struct StationsView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            selectedStation = "\(city) (\(station))"
+            let display = "\(city) (\(station))"
+            let raw = station
+            selectedStation = display
+            
+            let stationCode = viewModel.codes[station] ?? ""
+            
+            if isFrom {
+                parentViewModel.selectedStationFrom = display
+                parentViewModel.selectedStationFromRaw = raw
+                parentViewModel.selectedStationFromCode = stationCode
+                parentViewModel.selectedCityFromCode = viewModel.cityCode
+            } else {
+                parentViewModel.selectedStationTo = display
+                parentViewModel.selectedStationToRaw = raw
+                parentViewModel.selectedStationToCode = stationCode
+                parentViewModel.selectedCityToCode = viewModel.cityCode
+            }
+            showDivider = true
             withAnimation(.easeInOut(duration: 0.15)) {
-                path.removeLast(2)
+                if !path.isEmpty { path.removeLast(path.count) }
             }
         }
         .listRowSeparator(.hidden)
@@ -83,15 +113,24 @@ struct StationsView: View {
     @State var showDivider = true
     @State var selectedStation = ""
     @State var path = NavigationPath()
-    let viewModel = StationsViewModel(stations: ["Казанский вокзал", "Курский вокзал", "Белорусский вокзал"])
     
+    let stationsViewModel = StationsViewModel(stations: [
+        "Казанский вокзал",
+        "Курский вокзал",
+        "Белорусский вокзал"
+    ])
+    let routesViewModel = RoutesViewModel()
     return NavigationStack(path: $path) {
         StationsView(
             city: "Москва",
-            viewModel: viewModel,
+            viewModel: stationsViewModel,
             showDivider: $showDivider,
             selectedStation: $selectedStation,
-            path: $path
+            path: $path,
+            parentViewModel: routesViewModel,
+            isFrom: true
         )
     }
+    .previewLayout(.sizeThatFits)
+    .padding()
 }

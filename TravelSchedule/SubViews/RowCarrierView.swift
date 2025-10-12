@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 
 struct RowCarrierView: View {
@@ -34,13 +35,22 @@ struct RowCarrierView: View {
     // MARK: - Subviews
     private var carrierInfoBlock: some View {
         HStack(spacing: Constants.Common.spacing16) {
-            Image(.carrier)
-                .resizable()
-                .scaledToFit()
-                .frame(width: imageHeight, height: imageHeight)
-                .cornerRadius(Constants.Common.cornerRadius12)
-                .padding(.leading, 14)
-            
+            if let logoURL = route.thread.carrier.logo,
+               let url = URL(string: logoURL) {
+                KFImage(url)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: imageHeight, height: imageHeight)
+                    .cornerRadius(Constants.Common.cornerRadius12)
+                    .padding(.leading, 14)
+            } else {
+                Image(.carrier)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: imageHeight, height: imageHeight)
+                    .cornerRadius(Constants.Common.cornerRadius12)
+                    .padding(.leading, 14)
+            }
             VStack(alignment: .leading) {
                 Text(route.thread.carrier.title)
                     .font(.regular17)
@@ -93,37 +103,20 @@ struct RowCarrierView: View {
         }
     }
     
-    private func formatDate(_ isoDate: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.locale = Locale(identifier: "ru_RU")
-        
-        if let date = formatter.date(from: isoDate) {
-            let displayFormatter = DateFormatter()
-            displayFormatter.locale = .current
-            displayFormatter.setLocalizedDateFormatFromTemplate("dMMM")
-            return displayFormatter.string(from: date)
-        }
-        return isoDate
+    private func formatDate(_ date: Date?) -> String {
+        guard let date = date else { return "—" }
+        let displayFormatter = DateFormatter()
+        displayFormatter.locale = Locale(identifier: "ru_RU")
+        displayFormatter.setLocalizedDateFormatFromTemplate("dMMM")
+        return displayFormatter.string(from: date)
     }
     
-    private func formatTime(_ isoDateString: String) -> String {
-        let isoFormatter = ISO8601DateFormatter()
-        isoFormatter.formatOptions = [
-            .withInternetDateTime,
-            .withFractionalSeconds,
-            .withTimeZone,
-            .withColonSeparatorInTime
-        ]
-        
-        if let date = isoFormatter.date(from: isoDateString) ??
-            ISO8601DateFormatter().date(from: isoDateString) {
-            let timeFormatter = DateFormatter()
-            timeFormatter.dateFormat = "HH:mm"
-            timeFormatter.timeZone = TimeZone.current
-            return timeFormatter.string(from: date)
-        }
-        return isoDateString
+    private func formatTime(_ date: Date?) -> String {
+        guard let date = date else { return "—" }
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "HH:mm"
+        timeFormatter.timeZone = TimeZone.current
+        return timeFormatter.string(from: date)
     }
 }
 
@@ -132,16 +125,23 @@ struct RowCarrierView: View {
     let mockCarrier = Carrier(
         title: "РЖД",
         code: 123,
-        codes: nil
+        codes: nil,
+        logo: nil,
+        logo_svg: nil
     )
     let mockThread = Thread(uid: "028S_3_2", carrier: mockCarrier)
+    let formatter = ISO8601DateFormatter()
+    let departureDate = formatter.date(from: "2025-09-14T12:30:00+03:00")
+    let arrivalDate = formatter.date(from: "2025-09-14T18:00:00+03:00")
     let mockSegment = Segment(
         thread: mockThread,
-        start_date: "2025-09-14",
-        departure: "2025-09-14T12:30:00+03:00",
-        arrival: "2025-09-14T18:00:00+03:00",
+        start_date: Date(),
+        departure: departureDate,
+        arrival: arrivalDate,
         duration: 19800,
         has_transfers: false
     )
-    RowCarrierView(route: mockSegment)
+    return RowCarrierView(route: mockSegment)
+        .previewLayout(.sizeThatFits)
+        .padding()
 }

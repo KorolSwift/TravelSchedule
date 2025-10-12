@@ -9,10 +9,11 @@ import SwiftUI
 
 
 struct TabBarView: View {
-    @StateObject private var networkMonitor = NetworkMonitor()
+    var networkMonitor = NetworkMonitor()
     @State private var selectedTab = 0
     @State private var showDivider = true
     @State private var serverErrorMessage: String? = nil
+    @Bindable var viewModel: RoutesViewModel
     
     var body: some View {
         ZStack {
@@ -31,12 +32,11 @@ struct TabBarView: View {
         .onReceive(NotificationCenter.default.publisher(for: .serverErrorCleared)) { _ in
             serverErrorMessage = nil
         }
-        .environmentObject(networkMonitor)
     }
     
     private var tabbar: some View {
         TabView(selection: $selectedTab) {
-            TripSearchView(showDivider: $showDivider)
+              TripSearchView(showDivider: $showDivider, viewModel: viewModel)
                 .tabItem {
                     Image(.cloud)
                         .renderingMode(.template)
@@ -96,6 +96,7 @@ struct TabBarView: View {
 
 
 #Preview {
-    TabBarView()
-        .environmentObject(NetworkMonitor())
+    let routesViewModel = RoutesViewModel()
+    return TabBarView(viewModel: routesViewModel)
+        .previewLayout(.sizeThatFits)
 }

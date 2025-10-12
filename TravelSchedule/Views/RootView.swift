@@ -9,12 +9,13 @@ import SwiftUI
 
 
 struct RootView: View {
+    @State private var routesViewModel = RoutesViewModel()
     @State private var isActive = false
     
     var body: some View {
         Group {
             if isActive {
-                TabBarView()
+                TabBarView(viewModel: routesViewModel)
             } else {
                 SplashView()
             }

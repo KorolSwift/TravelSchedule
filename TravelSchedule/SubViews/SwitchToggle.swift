@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct SwitchToggle: View {
-    @AppStorage("isDarkMode") private var isDarkMode: Bool = false
+    @Binding var isDarkMode: Bool
     
     var body: some View {
         Toggle(Constants.Texts.darkMode, isOn: $isDarkMode)
@@ -22,5 +22,5 @@ struct SwitchToggle: View {
 
 
 #Preview {
-    SwitchToggle()
+    SwitchToggle(isDarkMode: .constant(true))
 }

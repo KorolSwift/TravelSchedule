@@ -37,6 +37,3 @@ final class AvailableStationsListServices: AvailableStationsListServicesProtocol
         return stationsList
     }
 }
-
-
-

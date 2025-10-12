@@ -11,12 +11,12 @@ import CoreData
 
 struct TripSearchView: View {
     @Binding var showDivider: Bool
-    @State private var viewModel = RoutesViewModel()
+    @Bindable var viewModel: RoutesViewModel
     @State private var selectedGroupIndex: Int? = nil
     @State private var showStories = false
     @State private var viewedStories: Set<Int> = []
-    let cities = MockData.cities
-    private let mockCarrierInfo = MockDataInfo.loadCarrierInfo()
+    @State private var citiesViewModel = CitiesViewModel()
+    
     private let storyGroups = (1...6).map { index in
         StoryGroup(images: ["\(index)", "\(index).1"])
     }
@@ -36,9 +36,6 @@ struct TripSearchView: View {
             }
             .navigationDestination(for: Nav.self) { dest in
                 navigationDestination(for: dest)
-            }
-            .onAppear {
-                viewModel.filteredRoutes = viewModel.allRoutes
             }
         }
     }
@@ -141,7 +138,6 @@ struct TripSearchView: View {
         }
         .onAppear {
             showDivider = true
-            //                        showServerError("500 Internal Server Error")
         }
     }
     
@@ -161,16 +157,15 @@ struct TripSearchView: View {
                 viewModel: viewModel,
                 showDivider: $showDivider
             )
-        case .segment:
-            if let carrier = mockCarrierInfo {
-                CarrierInfoView(showDivider: $showDivider, route: carrier)
-            } else {
-                EmptyView()
-            }
+        case .segment(let segment):
+            CarrierInfoView(
+                showDivider: $showDivider,
+                route: segment
+            )
         case .citiesFrom:
             CitiesView(
                 title: Constants.Texts.fromLabel,
-                viewModel: CitiesViewModel(cities: cities),
+                viewModel: citiesViewModel,
                 showDivider: $showDivider,
                 selectedStation: $viewModel.selectedStationFrom,
                 isFrom: true,
@@ -179,7 +174,7 @@ struct TripSearchView: View {
         case .citiesTo:
             CitiesView(
                 title: Constants.Texts.toLabel,
-                viewModel: CitiesViewModel(cities: cities),
+                viewModel: citiesViewModel,
                 showDivider: $showDivider,
                 selectedStation: $viewModel.selectedStationTo,
                 isFrom: false,
@@ -188,10 +183,12 @@ struct TripSearchView: View {
         case .stations(let city, let isFrom):
             StationsView(
                 city: city,
-                viewModel: StationsViewModel(stations: MockData.stations[city] ?? []),
+                viewModel: StationsViewModel(),
                 showDivider: $showDivider,
                 selectedStation: isFrom ? $viewModel.selectedStationFrom : $viewModel.selectedStationTo,
-                path: $viewModel.path
+                path: $viewModel.path,
+                parentViewModel: viewModel,
+                isFrom: isFrom
             )
         }
     }
@@ -199,6 +196,14 @@ struct TripSearchView: View {
 
 
 #Preview {
-    @State  var showDivider = true
-    TripSearchView(showDivider: $showDivider)
+    @State var showDivider = true
+    let routesViewModel = RoutesViewModel()
+    
+    return NavigationStack {
+        TripSearchView(
+            showDivider: $showDivider,
+            viewModel: routesViewModel
+        )
+    }
+    .previewLayout(.sizeThatFits)
 }
