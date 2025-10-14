@@ -21,7 +21,7 @@ final class StationsViewModel {
     init(stations: [String] = []) {
         self.stationList = stations
     }
-
+    
     var searchStations: [String] {
         searchString.isEmpty
         ? stationList
@@ -43,7 +43,7 @@ final class StationsViewModel {
                   let countries = root["countries"] as? [[String: Any]],
                   let ru = countries.first(where: { ($0["title"] as? String) == "Россия" }),
                   let regions = ru["regions"] as? [[String: Any]] else { return }
-
+            
             let target = normalize(city)
             var chosenSettlement: [String: Any]?
             var partialMatchCandidates: [[String: Any]] = []

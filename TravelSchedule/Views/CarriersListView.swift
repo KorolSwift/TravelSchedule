@@ -24,8 +24,8 @@ struct CarriersListView: View {
         .safeAreaInset(edge: .bottom) { filterButton }
         .toolbarRole(.editor)
         .onAppear {
-        showDivider = false
-    }
+            showDivider = false
+        }
         .task(id: viewModel.currentKey) {
             await viewModel.loadRoutesIfNeeded()
         }
@@ -82,11 +82,11 @@ struct CarriersListView: View {
     private var filterButton: some View {
         Button {
             Task {
-                       if viewModel.allRoutes.isEmpty {
-                           await viewModel.loadRoutesIfNeeded()
-                       }
-                       navigationPath.append(Nav.filtration)
-                   }
+                if viewModel.allRoutes.isEmpty {
+                    await viewModel.loadRoutesIfNeeded()
+                }
+                navigationPath.append(Nav.filtration)
+            }
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)

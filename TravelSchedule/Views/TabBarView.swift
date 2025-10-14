@@ -36,7 +36,7 @@ struct TabBarView: View {
     
     private var tabbar: some View {
         TabView(selection: $selectedTab) {
-              TripSearchView(showDivider: $showDivider, viewModel: viewModel)
+            TripSearchView(showDivider: $showDivider, viewModel: viewModel)
                 .tabItem {
                     Image(.cloud)
                         .renderingMode(.template)

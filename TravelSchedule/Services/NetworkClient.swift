@@ -18,13 +18,13 @@ actor NetworkClient {
     
     private init() {
         let resolvedURL = (try? Servers.Server1.url())
-            ?? URL(string: "https://api.rasp.yandex.net")
-            ?? URL(fileURLWithPath: "/dev/null")
-
+        ?? URL(string: "https://api.rasp.yandex.net")
+        ?? URL(fileURLWithPath: "/dev/null")
+        
         if resolvedURL.absoluteString.contains("rasp.yandex.net") {
             Self.logger.warning("Используется fallback URL: \(resolvedURL.absoluteString)")
         }
-
+        
         client = Client(
             serverURL: resolvedURL,
             transport: URLSessionTransport()

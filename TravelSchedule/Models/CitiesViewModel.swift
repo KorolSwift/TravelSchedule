@@ -17,11 +17,11 @@ final class CitiesViewModel {
     private let network = NetworkClient.shared
     var isLoading: Bool = false
     private let logger = Logger(label: "com.travelSchedule.cities")
-
+    
     init(cities: [String] = []) {
         self.cities = cities
     }
-
+    
     var searchCities: [String] {
         searchString.isEmpty
         ? cities

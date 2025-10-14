@@ -12,7 +12,7 @@ import Logging
 struct PersistenceController {
     static let shared = PersistenceController()
     private static let logger = Logger(label: "com.travelSchedule.coredata")
-
+    
     @MainActor
     static let preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)

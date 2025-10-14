@@ -11,7 +11,7 @@ import SwiftUI
 struct TermsView: View {
     @Binding var showDivider: Bool
     private let termsURLString = "https://yandex.ru/legal/practicum_offer/"
-
+    
     var body: some View {
         Group {
             if let url = URL(string: termsURLString) {
