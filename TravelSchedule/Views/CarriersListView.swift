@@ -26,9 +26,7 @@ struct CarriersListView: View {
         .onAppear {
         showDivider = false
     }
-        .task(id: "\(viewModel.selectedCityFromCode)_\(viewModel.selectedCityToCode)_\(viewModel.selectedStationFromRaw)_\(viewModel.selectedStationToRaw)") {
-            guard !viewModel.selectedCityFromCode.isEmpty,
-                  !viewModel.selectedCityToCode.isEmpty else { return }
+        .task(id: viewModel.currentKey) {
             await viewModel.loadRoutesIfNeeded()
         }
         .toolbar(.hidden, for: .tabBar)

@@ -14,11 +14,11 @@ struct Search: Decodable, Hashable, Sendable  {
 
 struct Segment: Decodable, Identifiable, Hashable, Sendable  {
     let thread: Thread
-    let start_date: Date?
+    let startDate: Date?
     let departure: Date?
     let arrival: Date?
     let duration: Double
-    let has_transfers: Bool
+    let hasTransfers: Bool
     
     var id: String {
         "\(thread.uid)_\(departure?.timeIntervalSince1970 ?? 0)"
@@ -35,7 +35,7 @@ struct Carrier: Decodable, Hashable, Sendable {
     let code: Int?
     let codes: CarrierCodes?
     let logo: String?
-    let logo_svg: String?
+    let logoSvg: String?
     
     struct CarrierCodes: Decodable, Hashable, Sendable {
         let iata: String?
@@ -89,8 +89,8 @@ struct Settlement: Decodable, Sendable {
 }
 
 struct SettlementCodes: Decodable, Sendable {
-    let yandex_code: String?
-    let esr_code: String?
+    let yandexCode: String?
+    let esrCode: String?
 }
 
 struct Station: Decodable, Sendable {
@@ -99,6 +99,6 @@ struct Station: Decodable, Sendable {
 }
 
 struct StationCodes: Decodable, Sendable {
-    let yandex_code: String?
-    let esr_code: String?
+    let yandexCode: String?
+    let esrCode: String?
 }

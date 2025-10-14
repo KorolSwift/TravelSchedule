@@ -58,7 +58,7 @@ struct RowCarrierView: View {
                     .truncationMode(.tail)
                     .foregroundColor(.black)
                 
-                if route.has_transfers {
+                if route.hasTransfers {
                     Text(Constants.Texts.withTransfer)
                         .font(.regular12)
                         .foregroundColor(.ypRed)
@@ -69,7 +69,7 @@ struct RowCarrierView: View {
     
     private var dateBlock: some View {
         VStack {
-            Text(formatDate(route.start_date))
+            Text(formatDate(route.startDate))
                 .padding(.trailing, 7)
                 .frame(maxHeight: .infinity, alignment: .top)
                 .font(.regular12)
@@ -127,7 +127,7 @@ struct RowCarrierView: View {
         code: 123,
         codes: nil,
         logo: nil,
-        logo_svg: nil
+        logoSvg: nil
     )
     let mockThread = Thread(uid: "028S_3_2", carrier: mockCarrier)
     let formatter = ISO8601DateFormatter()
@@ -135,11 +135,11 @@ struct RowCarrierView: View {
     let arrivalDate = formatter.date(from: "2025-09-14T18:00:00+03:00")
     let mockSegment = Segment(
         thread: mockThread,
-        start_date: Date(),
+        startDate: Date(),
         departure: departureDate,
         arrival: arrivalDate,
         duration: 19800,
-        has_transfers: false
+        hasTransfers: false
     )
     return RowCarrierView(route: mockSegment)
         .previewLayout(.sizeThatFits)

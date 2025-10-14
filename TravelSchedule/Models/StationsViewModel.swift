@@ -32,16 +32,6 @@ final class StationsViewModel {
         !isLoading && searchStations.isEmpty
     }
     
-    private func normalize(_ text: String) -> String {
-        var normalized = text.lowercased()
-        normalized = normalized.replacingOccurrences(of: "ё", with: "е")
-        normalized = normalized.trimmingCharacters(in: .whitespacesAndNewlines)
-        if normalized.hasPrefix("г. ") { normalized.removeFirst(3) }
-        if normalized.hasPrefix("город ") { normalized.removeFirst(6) }
-        normalized = normalized.replacingOccurrences(of: #"\s*\(.*?\)"#, with: "", options: .regularExpression)
-        return normalized
-    }
-    
     func loadStations(for city: String) async {
         guard stationList.isEmpty else { return }
         isLoading = true
@@ -53,9 +43,9 @@ final class StationsViewModel {
                   let countries = root["countries"] as? [[String: Any]],
                   let ru = countries.first(where: { ($0["title"] as? String) == "Россия" }),
                   let regions = ru["regions"] as? [[String: Any]] else { return }
-            
+
             let target = normalize(city)
-            var chosenSettlement: [String: Any]? = nil
+            var chosenSettlement: [String: Any]?
             var partialMatchCandidates: [[String: Any]] = []
             outer: for region in regions {
                 guard let settlements = region["settlements"] as? [[String: Any]] else { continue }
@@ -125,5 +115,15 @@ final class StationsViewModel {
             self.codes = [:]
             self.cityCode = ""
         }
+    }
+    
+    private func normalize(_ text: String) -> String {
+        var normalized = text.lowercased()
+        normalized = normalized.replacingOccurrences(of: "ё", with: "е")
+        normalized = normalized.trimmingCharacters(in: .whitespacesAndNewlines)
+        if normalized.hasPrefix("г. ") { normalized.removeFirst(3) }
+        if normalized.hasPrefix("город ") { normalized.removeFirst(6) }
+        normalized = normalized.replacingOccurrences(of: #"\s*\(.*?\)"#, with: "", options: .regularExpression)
+        return normalized
     }
 }

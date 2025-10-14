@@ -25,9 +25,8 @@ struct TripSearchView: View {
         NavigationStack(path: $viewModel.path) {
             VStack(spacing: Constants.Common.spacing0) {
                 storiesHeader
-                    .padding(.top, 24)
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 24)
+                    .padding([.top, .bottom], 24)
                 searchHeader
                 if viewModel.canSearch {
                     searchButton

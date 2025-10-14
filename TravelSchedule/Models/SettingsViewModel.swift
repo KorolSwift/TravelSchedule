@@ -17,5 +17,5 @@ final class SettingsViewModel {
         set { UserDefaults.standard.set(newValue, forKey: darkModeKey) }
     }
     
-    var serverErrorMessage: String? = nil
+    var serverErrorMessage: String?
 }

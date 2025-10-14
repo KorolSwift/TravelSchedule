@@ -10,6 +10,8 @@
 		021FF3B02E73293D0012CBF2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 021FF3AF2E73293D0012CBF2 /* Assets.xcassets */; };
 		02449EC72E58D034003927D8 /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 02449EC62E58D034003927D8 /* OpenAPIRuntime */; };
 		02449ECA2E58D198003927D8 /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = 02449EC92E58D198003927D8 /* OpenAPIURLSession */; };
+		02555E8F2E9D6608000CA85F /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 02555E8E2E9D6608000CA85F /* Logging */; };
+		02555F7E2E9E1D52000CA85F /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 02555F462E9E1D52000CA85F /* .gitignore */; };
 		02B421F72E968D0200394DB2 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 02B421F62E968D0200394DB2 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +37,7 @@
 		02449E8E2E58CE55003927D8 /* TravelSchedule.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelSchedule.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		02449EA32E58CE57003927D8 /* TravelScheduleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelScheduleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		02449EAD2E58CE57003927D8 /* TravelScheduleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelScheduleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		02555F462E9E1D52000CA85F /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -75,6 +78,7 @@
 			files = (
 				02B421F72E968D0200394DB2 /* Kingfisher in Frameworks */,
 				02449ECA2E58D198003927D8 /* OpenAPIURLSession in Frameworks */,
+				02555E8F2E9D6608000CA85F /* Logging in Frameworks */,
 				02449EC72E58D034003927D8 /* OpenAPIRuntime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -104,6 +108,7 @@
 				02449EA62E58CE57003927D8 /* TravelScheduleTests */,
 				02449EB02E58CE57003927D8 /* TravelScheduleUITests */,
 				02449E8F2E58CE55003927D8 /* Products */,
+				02555F462E9E1D52000CA85F /* .gitignore */,
 			);
 			sourceTree = "<group>";
 		};
@@ -141,6 +146,7 @@
 				02449EC62E58D034003927D8 /* OpenAPIRuntime */,
 				02449EC92E58D198003927D8 /* OpenAPIURLSession */,
 				02B421F62E968D0200394DB2 /* Kingfisher */,
+				02555E8E2E9D6608000CA85F /* Logging */,
 			);
 			productName = TravelSchedule;
 			productReference = 02449E8E2E58CE55003927D8 /* TravelSchedule.app */;
@@ -229,6 +235,7 @@
 				02449EC82E58D198003927D8 /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
 				0218F0092E5EDBAF006D0596 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */,
 				02B421F52E968D0200394DB2 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				02555E8D2E9D6608000CA85F /* XCRemoteSwiftPackageReference "swift-log" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 02449E8F2E58CE55003927D8 /* Products */;
@@ -248,6 +255,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				021FF3B02E73293D0012CBF2 /* Assets.xcassets in Resources */,
+				02555F7E2E9E1D52000CA85F /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -626,6 +634,14 @@
 				minimumVersion = 1.1.0;
 			};
 		};
+		02555E8D2E9D6608000CA85F /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.4;
+			};
+		};
 		02B421F52E968D0200394DB2 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -651,6 +667,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 02449EC82E58D198003927D8 /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */;
 			productName = OpenAPIURLSession;
+		};
+		02555E8E2E9D6608000CA85F /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 02555E8D2E9D6608000CA85F /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
 		};
 		02B421F62E968D0200394DB2 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;

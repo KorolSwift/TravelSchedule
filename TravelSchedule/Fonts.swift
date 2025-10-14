@@ -5,7 +5,7 @@
 //  Created by Ди Di on 23/09/25.
 //
 
-import SwiftUICore
+import SwiftUI
 
 
 extension Font {

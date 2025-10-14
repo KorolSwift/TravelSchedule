@@ -8,6 +8,7 @@
 import SwiftUI
 import OpenAPIURLSession
 import OpenAPIRuntime
+import Logging
 
 
 @MainActor
@@ -31,6 +32,10 @@ final class RoutesViewModel {
     var selectedTransfer: String = ""
     var shouldResetOnAppear = false
     var isLoading: Bool = false
+    private let logger = Logger(label: "com.travelSchedule.cities")
+    var currentKey: String {
+        "\(selectedCityFromCode)|\(selectedCityToCode)|\(selectedStationFromRaw)|\(selectedStationToRaw)"
+    }
     
     private var lastLoadedKey: String?
     
@@ -80,8 +85,8 @@ final class RoutesViewModel {
     
     func matchesTransferFilter(_ route: Segment) -> Bool {
         switch selectedTransfer.trimmingCharacters(in: .whitespacesAndNewlines) {
-        case "Да":  return route.has_transfers
-        case "Нет": return !route.has_transfers
+        case "Да":  return route.hasTransfers
+        case "Нет": return !route.hasTransfers
         default:    return true
         }
     }
@@ -95,6 +100,14 @@ final class RoutesViewModel {
 
 @MainActor
 extension RoutesViewModel {
+    private static let isoFormatter = ISO8601DateFormatter()
+    private static let simpleFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        return f
+    }()
+    
     func loadRoutes(fromCode: String, toCode: String, date: String) async {
         isLoading = true
         defer { isLoading = false }
@@ -139,7 +152,7 @@ extension RoutesViewModel {
                         icao: carrierData?.codes?.icao
                     ),
                     logo: carrierData?.logo,
-                    logo_svg: nil
+                    logoSvg: nil
                 )
                 
                 let threadModel = Thread(
@@ -149,32 +162,26 @@ extension RoutesViewModel {
                 
                 return Segment(
                     thread: threadModel,
-                    start_date: parseDate(api.start_date),
+                    startDate: parseDate(api.start_date),
                     departure: api.departure,
                     arrival: api.arrival,
                     duration: Double(api.duration ?? 0),
-                    has_transfers: api.has_transfers ?? false
+                    hasTransfers: api.has_transfers ?? false
                 )
             }
             if !self.hasActiveFilters {
                 self.filteredRoutes = self.allRoutes
             }
+        } catch is CancellationError {
+            logger.notice("Загрузка маршрутов отменена пользователем.")
         } catch {
-            print("Ошибка загрузки маршрутов: \(error.localizedDescription)")
+            logger.error("Ошибка загрузки маршрутов: \(error.localizedDescription)")
         }
     }
     
     private func parseDate(_ string: String?) -> Date? {
-        guard let string = string else { return nil }
-        let isoFormatter = ISO8601DateFormatter()
-        if let date = isoFormatter.date(from: string) {
-            return date
-        }
-        
-        let simpleFormatter = DateFormatter()
-        simpleFormatter.dateFormat = "yyyy-MM-dd"
-        simpleFormatter.locale = Locale(identifier: "en_US_POSIX")
-        return simpleFormatter.date(from: string)
+        guard let string else { return nil }
+        return Self.isoFormatter.date(from: string) ?? Self.simpleFormatter.date(from: string)
     }
     
     func loadRoutesIfNeeded(date: String? = nil) async {

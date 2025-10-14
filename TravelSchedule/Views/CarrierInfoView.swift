@@ -26,15 +26,13 @@ struct CarrierInfoView: View {
             } else if let info = carrierInfo {
                 VStack(alignment: .leading, spacing: Constants.Common.spacing16) {
                     CarrierImageView(logo: info.carrier?.logo)
-
+                    
                     if let carrier = info.carrier {
                         CarrierTitleView(title: carrier.title ?? "Без названия")
                         CarrierContactInfoView(email: carrier.email, phone: carrier.phone)
                     }
                 }
-                .padding(.top, 16)
-                .padding(.horizontal, 16)
-                
+                .padding([.top, .horizontal], 16)
                 Spacer()
             }
         }
@@ -44,39 +42,37 @@ struct CarrierInfoView: View {
         .toolbar(.hidden, for: .tabBar)
         .onAppear {
             showDivider = false
-            Task { @Sendable in
-                await loadCarrierInfo()
-            }
+            Task { await loadCarrierInfo() }
         }
     }
     
     // MARK: - Subviews
-        private struct CarrierImageView: View {
-            let logo: String?
-
-            var body: some View {
-                if let logo = logo, let url = URL(string: logo) {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .empty:
-                            ProgressView()
-                                .frame(maxWidth: .infinity)
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxWidth: .infinity)
-                        case .failure:
-                            EmptyView()
-                        @unknown default:
-                            EmptyView()
-                        }
+    private struct CarrierImageView: View {
+        let logo: String?
+        
+        var body: some View {
+            if let logo, let url = URL(string: logo) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                    case .failure:
+                        EmptyView()
+                    @unknown default:
+                        EmptyView()
                     }
-                } else {
-                    EmptyView()
                 }
+            } else {
+                EmptyView()
             }
         }
+    }
     
     private struct CarrierTitleView: View {
         let title: String
@@ -122,22 +118,21 @@ struct CarrierInfoView: View {
             .frame(height: Constants.Common.height60)
         }
     }
-        
-        private func loadCarrierInfo() async {
-            guard let code = route.thread.carrier.codes?.iata else {
-                errorMessage = "Нет кода перевозчика (IATA)"
-                isLoading = false
-                return
-            }
-            do {
-                async let info = NetworkClient.shared.fetchCarrierInformation(code: code, system: "iata")
-                carrierInfo = try await info
-            } catch {
-                errorMessage = "Ошибка загрузки: \(error.localizedDescription)"
-            }
-
+    
+    private func loadCarrierInfo() async {
+        guard let code = route.thread.carrier.codes?.iata else {
+            errorMessage = "Нет кода перевозчика (IATA)"
             isLoading = false
+            return
         }
+        do {
+            async let info = NetworkClient.shared.fetchCarrierInformation(code: code, system: "iata")
+            carrierInfo = try await info
+        } catch {
+            errorMessage = "Ошибка загрузки: \(error.localizedDescription)"
+        }
+        isLoading = false
+    }
 }
 
 
@@ -147,16 +142,16 @@ struct CarrierInfoView: View {
         code: 123,
         codes: Carrier.CarrierCodes(iata: "HY", sirena: nil, icao: "UZB"),
         logo: nil,
-        logo_svg: nil
+        logoSvg: nil
     )
     let mockThread = Thread(uid: "HY001", carrier: mockCarrier)
     let mockSegment = Segment(
         thread: mockThread,
-        start_date: Date(),
+        startDate: Date(),
         departure: Date(),
         arrival: Date().addingTimeInterval(7200),
         duration: 7200,
-        has_transfers: false
+        hasTransfers: false
     )
     return CarrierInfoView(
         showDivider: .constant(false),

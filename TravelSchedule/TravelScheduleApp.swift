@@ -10,7 +10,6 @@ import SwiftUI
 
 @main
 struct TravelScheduleApp: App {
-    var networkMonitor = NetworkMonitor()
     @AppStorage("isDarkMode") private var isDarkMode: Bool = false
     
     var body: some Scene {

@@ -7,23 +7,26 @@
 
 import OpenAPIURLSession
 import Foundation
+import Logging
 
 
 actor NetworkClient {
     static let shared = NetworkClient()
     private let client: Client
     private let apikey: String
+    private static let logger = Logger(label: "com.travelSchedule.network")
     
-    init() {
-        let url: URL
-        do {
-            url = try Servers.Server1.url()
-        } catch {
-            print("Ошибка получения serverURL, используется дефолтный URL:", error)
-            url = URL(string: "https://api.rasp.yandex.net")!
+    private init() {
+        let resolvedURL = (try? Servers.Server1.url())
+            ?? URL(string: "https://api.rasp.yandex.net")
+            ?? URL(fileURLWithPath: "/dev/null")
+
+        if resolvedURL.absoluteString.contains("rasp.yandex.net") {
+            Self.logger.warning("Используется fallback URL: \(resolvedURL.absoluteString)")
         }
+
         client = Client(
-            serverURL: url,
+            serverURL: resolvedURL,
             transport: URLSessionTransport()
         )
         apikey = ApiKeyProvider.shared.value

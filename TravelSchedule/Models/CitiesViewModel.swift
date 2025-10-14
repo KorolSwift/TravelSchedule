@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Logging
 
 
 @MainActor
@@ -15,7 +16,8 @@ final class CitiesViewModel {
     var cities: [String] = []
     private let network = NetworkClient.shared
     var isLoading: Bool = false
-    
+    private let logger = Logger(label: "com.travelSchedule.cities")
+
     init(cities: [String] = []) {
         self.cities = cities
     }
@@ -54,7 +56,10 @@ final class CitiesViewModel {
                 )
             ).sorted()
         } catch is CancellationError {
+            logger.debug("Загрузка городов была отменена")
+            return
         } catch {
+            logger.error("Ошибка при загрузке городов: \(error.localizedDescription)")
             self.cities = []
         }
     }
