@@ -1,0 +1,28 @@
+# Xcode project files
+*.xcuserstate
+xcuserdata/
+**/xcuserdata/
+DerivedData/
+*.xccheckout
+*.moved-aside
+*.xcscmblueprint
+
+# Build artifacts
+build/
+Build/
+*.o
+*.dSYM/
+*.ipa
+
+# Swift Package Manager
+/.build/
+/.swiftpm/
+Package.resolved
+
+# macOS system files
+*.DS_Store
+
+# Editor / temp files
+*.swp
+*.lock
+*.idea/
