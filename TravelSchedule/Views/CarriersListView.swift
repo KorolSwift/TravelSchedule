@@ -25,9 +25,12 @@ struct CarriersListView: View {
         .toolbarRole(.editor)
         .onAppear {
             showDivider = false
-            viewModel.handleOnAppear()
+        }
+        .task(id: viewModel.currentKey) {
+            await viewModel.loadRoutesIfNeeded()
         }
         .toolbar(.hidden, for: .tabBar)
+        .toolbarBackground(.hidden, for: .tabBar)
     }
     
     // MARK: - Subviews
@@ -40,7 +43,11 @@ struct CarriersListView: View {
     
     @ViewBuilder
     private var contentView: some View {
-        if viewModel.filteredRoutes.isEmpty {
+        if viewModel.isLoading {
+            ProgressView()
+                .progressViewStyle(.circular)
+                .frame(maxHeight: .infinity)
+        } else if viewModel.filteredRoutes.isEmpty {
             emptyStateView
         } else {
             routesListView
@@ -74,11 +81,12 @@ struct CarriersListView: View {
     
     private var filterButton: some View {
         Button {
-            if viewModel.allRoutes.isEmpty, let search = viewModel.loadMockSearch() {
-                viewModel.allRoutes = search.segments
-                viewModel.filteredRoutes = search.segments
+            Task {
+                if viewModel.allRoutes.isEmpty {
+                    await viewModel.loadRoutesIfNeeded()
+                }
+                navigationPath.append(Nav.filtration)
             }
-            navigationPath.append(Nav.filtration)
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: Constants.Common.cornerRadius24)

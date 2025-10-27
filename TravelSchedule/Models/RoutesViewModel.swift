@@ -7,18 +7,37 @@
 
 import SwiftUI
 import OpenAPIURLSession
+import OpenAPIRuntime
+import Logging
 
 
+@MainActor
 @Observable
 final class RoutesViewModel {
     var path = NavigationPath()
+    
     var selectedStationFrom: String = ""
     var selectedStationTo: String = ""
+    var selectedStationFromCode: String = ""
+    var selectedStationToCode: String = ""
+    var selectedCityFromCode: String = ""
+    var selectedCityToCode: String = ""
+    var selectedStationFromRaw: String = ""
+    var selectedStationToRaw: String = ""
+    
+    var hasLoadedOnce = false
     var allRoutes: [Segment] = []
     var filteredRoutes: [Segment] = []
     var selectedTimes: Set<String> = []
     var selectedTransfer: String = ""
     var shouldResetOnAppear = false
+    var isLoading: Bool = false
+    private let logger = Logger(label: "com.travelSchedule.cities")
+    var currentKey: String {
+        "\(selectedCityFromCode)|\(selectedCityToCode)|\(selectedStationFromRaw)|\(selectedStationToRaw)"
+    }
+    
+    private var lastLoadedKey: String?
     
     var hasActiveFilters: Bool {
         !selectedTimes.isEmpty || !selectedTransfer.isEmpty
@@ -30,13 +49,12 @@ final class RoutesViewModel {
     
     func swapStations() {
         swap(&selectedStationFrom, &selectedStationTo)
+        swap(&selectedStationFromCode, &selectedStationToCode)
+        swap(&selectedCityFromCode, &selectedCityToCode)
+        swap(&selectedStationFromRaw, &selectedStationToRaw)
     }
     
     func handleOnAppear() {
-        if allRoutes.isEmpty, let search = loadMockSearch() {
-            allRoutes = search.segments
-            filteredRoutes = search.segments
-        }
         if shouldResetOnAppear {
             filteredRoutes = allRoutes
             shouldResetOnAppear = false
@@ -47,23 +65,19 @@ final class RoutesViewModel {
         filteredRoutes = allRoutes.filter { route in
             matchesTimeFilter(route.departure) && matchesTransferFilter(route)
         }
-        selectedTimes.removeAll()
-        selectedTransfer = ""
     }
     
-    func matchesTimeFilter(_ departure: String) -> Bool {
+    func matchesTimeFilter(_ departure: Date?) -> Bool {
         guard !selectedTimes.isEmpty else { return true }
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withTimeZone]
-        guard let date = formatter.date(from: departure) else { return false }
-        let hour = Calendar.current.component(.hour, from: date)
+        guard let date = departure else { return false }
         
+        let hour = Calendar.current.component(.hour, from: date)
         return selectedTimes.contains { timeRange in
             switch timeRange {
             case FilterTimeRange.morning: return (6..<12).contains(hour)
-            case FilterTimeRange.day: return (12..<18).contains(hour)
+            case FilterTimeRange.day:     return (12..<18).contains(hour)
             case FilterTimeRange.evening: return (18..<24).contains(hour)
-            case FilterTimeRange.night: return (0..<6).contains(hour)
+            case FilterTimeRange.night:   return (0..<6).contains(hour)
             default: return false
             }
         }
@@ -71,238 +85,124 @@ final class RoutesViewModel {
     
     func matchesTransferFilter(_ route: Segment) -> Bool {
         switch selectedTransfer.trimmingCharacters(in: .whitespacesAndNewlines) {
-        case "Да":  return route.has_transfers
-        case "Нет": return !route.has_transfers
+        case "Да":  return route.hasTransfers
+        case "Нет": return !route.hasTransfers
         default:    return true
         }
     }
     
-    func loadMockSearch() -> Search? {
-        guard let url = Bundle.main.url(forResource: "search", withExtension: "json") else {
-            print("Не найден файл search.json")
-            return nil
-        }
+    private func currentDateString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
+    }
+}
+
+@MainActor
+extension RoutesViewModel {
+    private static let isoFormatter = ISO8601DateFormatter()
+    private static let simpleFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        return f
+    }()
+    
+    func loadRoutes(fromCode: String, toCode: String, date: String) async {
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
-            let data = try Data(contentsOf: url)
-            return try JSONDecoder().decode(Search.self, from: data)
+            let schedule = try await NetworkClient.shared.fetchScheduleBTWStations(
+                from: fromCode,
+                to: toCode,
+                date: date
+            )
+            
+            var apiSegments = schedule.segments ?? []
+            
+            if fromCode.hasPrefix("s") && toCode.hasPrefix("s"),
+               !selectedStationFromRaw.isEmpty, !selectedStationToRaw.isEmpty {
+                let fromRaw = selectedStationFromRaw.lowercased()
+                let toRaw = selectedStationToRaw.lowercased()
+                
+                apiSegments = apiSegments.filter { seg in
+                    let fromSeg = (seg.from?.title ?? "").lowercased()
+                    let toSeg = (seg.to?.title ?? "").lowercased()
+                    return fromSeg.contains(fromRaw) && toSeg.contains(toRaw)
+                }
+            }
+            
+            self.allRoutes = apiSegments.map { api in
+                let thread = api.thread
+                let carrierData = thread?.carrier
+                
+                let carrier = Carrier(
+                    title: carrierData?.title ?? "Неизвестно",
+                    code: {
+                        if let codeString = carrierData?.code {
+                            return Int(codeString)
+                        } else {
+                            return nil
+                        }
+                    }(),
+                    codes: Carrier.CarrierCodes(
+                        iata: carrierData?.codes?.iata,
+                        sirena: carrierData?.codes?.sirena,
+                        icao: carrierData?.codes?.icao
+                    ),
+                    logo: carrierData?.logo,
+                    logoSvg: nil
+                )
+                
+                let threadModel = Thread(
+                    uid: thread?.uid ?? "",
+                    carrier: carrier
+                )
+                
+                return Segment(
+                    thread: threadModel,
+                    startDate: parseDate(api.start_date),
+                    departure: api.departure,
+                    arrival: api.arrival,
+                    duration: Double(api.duration ?? 0),
+                    hasTransfers: api.has_transfers ?? false
+                )
+            }
+            if !self.hasActiveFilters {
+                self.filteredRoutes = self.allRoutes
+            }
+        } catch is CancellationError {
+            logger.notice("Загрузка маршрутов отменена пользователем.")
         } catch {
-            print("Ошибка парсинга JSON: \(error)")
-            return nil
+            logger.error("Ошибка загрузки маршрутов: \(error.localizedDescription)")
         }
     }
     
-    func testFetchStations() {
-        Task {
-            do {
-                let client = Client(
-                    serverURL: try Servers.Server1.url(),
-                    transport: URLSessionTransport()
-                )
-                
-                let service = NearestStationsService(
-                    client: client,
-                    apikey: ApiKeyProvider.shared.value
-                )
-                
-                print("Fetching stations...")
-                let stations = try await service.getNearestStations(
-                    lat: 59.864177,
-                    lng: 30.319163,
-                    distance: 50
-                )
-                
-                print("Successfully fetched stations: \(stations)")
-            } catch {
-                print("Error fetching stations: \(error)")
-            }
-        }
+    private func parseDate(_ string: String?) -> Date? {
+        guard let string else { return nil }
+        return Self.isoFormatter.date(from: string) ?? Self.simpleFormatter.date(from: string)
     }
     
-    func testFetchNearestSettlement() {
-        Task {
-            do {
-                let client = Client(
-                    serverURL: try Servers.Server1.url(),
-                    transport: URLSessionTransport()
+    func loadRoutesIfNeeded(date: String? = nil) async {
+        guard !selectedCityFromCode.isEmpty,
+              !selectedCityToCode.isEmpty,
+              !isLoading else { return }
+        
+        let dateString = date ?? currentDateString()
+        let key = "\(selectedCityFromCode)|\(selectedCityToCode)|\(dateString)|\(selectedStationFromRaw)|\(selectedStationToRaw)"
+        guard key != lastLoadedKey else { return }
+        
+        isLoading = true
+        defer { isLoading = false }
+        
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                await self.loadRoutes(
+                    fromCode: self.selectedCityFromCode,
+                    toCode: self.selectedCityToCode,
+                    date: dateString
                 )
-                
-                let service = NearestSettlementService(
-                    client: client,
-                    apikey: ApiKeyProvider.shared.value
-                )
-                
-                print("Fetching nearest settlement...")
-                let settlement = try await service.getNearestSettlement(
-                    lat: 50.440046,
-                    lng: 40.4882367,
-                    distance: 50
-                )
-                
-                print("Successfully fetched settlement: \(settlement)")
-            } catch {
-                print("Error fetching settlement: \(error)")
-            }
-        }
-    }
-    
-    func testFetchCarrierInformation() {
-        Task {
-            do {
-                let client = Client(
-                    serverURL: try Servers.Server1.url(),
-                    transport: URLSessionTransport()
-                )
-                
-                let service = CarrierInformationService(
-                    client: client,
-                    apikey: ApiKeyProvider.shared.value
-                )
-                
-                print("Fetching carrier information...")
-                let information = try await service.getCarrierInformation(
-                    code: "TK",
-                    system: "iata"
-                )
-                
-                print("Successfully fetched carrier information: \(information)")
-            } catch {
-                print("Error fetching carrier information: \(error)")
-            }
-        }
-    }
-    
-    func testFetchScheduleBTWStations() {
-        Task {
-            do {
-                let client = Client(
-                    serverURL: try Servers.Server1.url(),
-                    transport: URLSessionTransport()
-                )
-                
-                let service = ScheduleBTWStationsService(
-                    client: client,
-                    apikey: ApiKeyProvider.shared.value
-                )
-                
-                print("Fetching schedule between stations...")
-                let scheduleBTW = try await service.getScheduleBTWStations(
-                    from: "c146",
-                    to: "c213",
-                    date: "2025-09-02"
-                )
-                
-                print("Successfully fetched schedule between stations: \(scheduleBTW)")
-            } catch {
-                print("Error fetching schedule between stations \(error)")
-            }
-        }
-    }
-    
-    func testFetchScheduleByStations() {
-        Task {
-            do {
-                let client = Client(
-                    serverURL: try Servers.Server1.url(),
-                    transport: URLSessionTransport()
-                )
-                
-                let service = ScheduleByStationsServices(
-                    client: client,
-                    apikey: ApiKeyProvider.shared.value
-                )
-                
-                print("Fetching schedule by stations...")
-                let scheduleByStations = try await service.getScheduleByStations(
-                    station: "s9600213"
-                )
-                
-                print("Successfully fetched schedule by stations: \(scheduleByStations)")
-            } catch {
-                print("Error fetching schedule by stations \(error)")
-            }
-        }
-    }
-    
-    func testFetchStationsList() {
-        Task {
-            do {
-                let client = Client(
-                    serverURL: try Servers.Server1.url(),
-                    transport: URLSessionTransport()
-                )
-                
-                let service = StationsListServices(
-                    client: client,
-                    apikey: ApiKeyProvider.shared.value
-                )
-                
-                print("Fetching list of stations...")
-                let stationsList = try await service.getStationsList(
-                    uid: "098S_7_2"
-                )
-                
-                print("Successfully fetched list of stations \(stationsList)")
-            } catch {
-                print("Error fetching list of stations \(error)")
-            }
-        }
-    }
-    
-    func testFetchCopyrightYandexSchedules() {
-        Task {
-            do {
-                let client = Client(
-                    serverURL: try Servers.Server1.url(),
-                    transport: URLSessionTransport()
-                )
-                
-                let service = CopyrightYandexSchedulesServices(
-                    client: client,
-                    apikey: ApiKeyProvider.shared.value
-                )
-                
-                print("Fetching copyright yandex schedules..")
-                let copyright = try await service.getCopyrightYandexSchedules(
-                    format: "json"
-                )
-                
-                print("Successfully fetched copyright yandex schedules \(copyright)")
-            } catch {
-                print("Error fetching copyright yandex schedules \(error)")
-            }
-        }
-    }
-    
-    func testAvailableStationsList() {
-        Task {
-            do {
-                let client = Client(
-                    serverURL: try Servers.Server1.url(),
-                    transport: URLSessionTransport()
-                )
-                
-                let service = AvailableStationsListServices(
-                    client: client,
-                    apikey: ApiKeyProvider.shared.value
-                )
-                
-                print("Fetching available stations list..")
-                let availableStations = try await service.getAvailableStationsList()
-                
-                let encoder = JSONEncoder()
-                encoder.outputFormatting = .prettyPrinted
-                
-                let data = try encoder.encode(availableStations)
-                let fileManager = FileManager.default
-                let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-                let fileURL = documentsURL.appendingPathComponent("AvailableStationsList.json")
-                try data.write(to: fileURL)
-                
-                print("Successfully saved stations list to file:")
-                print(fileURL.path)
-                
-            } catch {
-                print("Error fetching available stations list \(error)")
             }
         }
     }

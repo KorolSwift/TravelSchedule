@@ -10,12 +10,12 @@ import SwiftUI
 
 struct SettingsView: View {
     @Binding var showDivider: Bool
-    @State private var serverErrorMessage: String? = nil
+    @State private var viewModel = SettingsViewModel()
     
     var body: some View {
         NavigationStack {
             VStack {
-                SwitchToggle()
+                SwitchToggle(isDarkMode: $viewModel.isDarkMode)
                     .padding(.top, 24)
                     .frame(height: Constants.Common.height60)
                 NavigationLink(destination: TermsView(showDivider: $showDivider)) {
@@ -43,7 +43,6 @@ struct SettingsView: View {
             .toolbarRole(.editor)
             .onAppear {
                 showDivider = true
-                //            showServerError("500 Internal Server Error")
             }
         }
     }
@@ -53,6 +52,5 @@ struct SettingsView: View {
 #Preview {
     @State var showDivider = true
     SettingsView(showDivider: $showDivider)
-        .environmentObject(NetworkMonitor())
 }
 

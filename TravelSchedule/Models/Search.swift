@@ -5,33 +5,39 @@
 //  Created by Ди Di on 08/09/25.
 //
 
+import Foundation
 
-struct Search: Decodable, Hashable  {
+
+struct Search: Decodable, Hashable, Sendable  {
     let segments: [Segment]
 }
 
-struct Segment: Decodable, Identifiable, Hashable  {
+struct Segment: Decodable, Identifiable, Hashable, Sendable  {
     let thread: Thread
-    let start_date: String
-    let departure: String
-    let arrival: String
+    let startDate: Date?
+    let departure: Date?
+    let arrival: Date?
     let duration: Double
-    let has_transfers: Bool
+    let hasTransfers: Bool
     
-    var id: String { "\(thread.uid)_\(departure)" }
+    var id: String {
+        "\(thread.uid)_\(departure?.timeIntervalSince1970 ?? 0)"
+    }
 }
 
-struct Thread: Decodable, Hashable  {
+struct Thread: Decodable, Hashable, Sendable  {
     let uid: String
     let carrier: Carrier
 }
 
-struct Carrier: Decodable, Hashable  {
+struct Carrier: Decodable, Hashable, Sendable {
     let title: String
     let code: Int?
     let codes: CarrierCodes?
+    let logo: String?
+    let logoSvg: String?
     
-    struct CarrierCodes: Decodable, Hashable {
+    struct CarrierCodes: Decodable, Hashable, Sendable {
         let iata: String?
         let sirena: String?
         let icao: String?
@@ -54,4 +60,45 @@ enum FilterTimeRange {
     static let evening = "Вечер 18:00 - 00:00"
     static let night = "Ночь 00:00 - 06:00"
     static let allOptions = [morning, day, evening, night]
+}
+
+struct StationItem: Hashable, Identifiable {
+    let code: String
+    let title: String
+    var id: String { code }
+}
+
+struct AvailableStationsResponse: Decodable, Sendable {
+    let countries: [Country]?
+}
+
+struct Country: Decodable, Sendable {
+    let title: String?
+    let regions: [Region]?
+}
+
+struct Region: Decodable, Sendable {
+    let title: String?
+    let settlements: [Settlement]?
+}
+
+struct Settlement: Decodable, Sendable {
+    let title: String?
+    let codes: SettlementCodes?
+    let stations: [Station]?
+}
+
+struct SettlementCodes: Decodable, Sendable {
+    let yandexCode: String?
+    let esrCode: String?
+}
+
+struct Station: Decodable, Sendable {
+    let title: String?
+    let codes: StationCodes?
+}
+
+struct StationCodes: Decodable, Sendable {
+    let yandexCode: String?
+    let esrCode: String?
 }

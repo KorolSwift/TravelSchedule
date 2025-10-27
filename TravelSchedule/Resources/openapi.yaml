@@ -495,6 +495,10 @@ components:
           type: number
         type:
           type: string
+        stations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Station'
     CarrierInfo:
       type: object
       properties:
@@ -818,9 +822,15 @@ components:
       properties:
         yandex:
           type: string
+        yandexCode:
+          type: string
         esr:
           type: string
+        esrCode:
+          type: string
         express:
+          type: string
+        expressCode:
           type: string
     Direction:
       type: object

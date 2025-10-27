@@ -7,12 +7,14 @@
 
 import Network
 import Combine
+import SwiftUI
 
 
-final class NetworkMonitor: ObservableObject {
+@Observable
+final class NetworkMonitor {
     private var monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitor")
-    @Published var isConnected: Bool = true
+    var isConnected: Bool = true
     
     init() {
         monitor.pathUpdateHandler = { [weak self] path in
